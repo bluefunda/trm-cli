@@ -33,7 +33,7 @@ func fetchUsers(userID string) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	// Read the response body
+	// Read the response
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", fmt.Errorf("failed to read response body: %v", err)
