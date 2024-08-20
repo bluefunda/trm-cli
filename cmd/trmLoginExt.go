@@ -12,7 +12,7 @@ var (
 
 // loginCmd represents the login command
 var loginCmd = &cobra.Command{
-	Use:   "trm-login",
+	Use:   "login",
 	Short: "Log in to the application",
 	Run: func(cmd *cobra.Command, args []string) {
 		username = promptForInput("Enter username: ")
