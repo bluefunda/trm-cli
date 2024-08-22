@@ -8,35 +8,32 @@ import (
 	"os"
 )
 
-// HTTPClient is a reusable HTTP client instance
-var httpClient = &http.Client{}
-
-// createUser creates a new user with the provided username and returns a response message
-func createUser(username string) (string, error) {
-	// Base URLs
+// cloneUser creates a new user with the provided username and returns a response message
+func cloneUser(usernameFrom, username string) (string, error) {
+	// Define constants for environment variables and URLs
 	const (
+		csrfTokenEnv = "CSRF_TOKEN"
 		baseURL      = "https://abapdev.bluefunda.com:8080/rest/apim/v1/system/users"
-		tempPassword = "Welcome123"
 	)
 
-	// User represents the structure of the user data to be sent in the request body
-	type user struct {
-		UserName string `json:"userName"`
-		Password string `json:"password"`
+	// Define your User struct
+	type userclone struct {
+		UserNameFrom string `json:"userNameFrom"`
+		UserName     string `json:"userName"`
+		Password     string `json:"password"`
 	}
+	// Placeholder for password, replace with actual values or logic
+	tempPassword := "Welcome123"
 
-	userData := user{
-		UserName: username,
-		Password: tempPassword,
+	userData := userclone{
+		UserNameFrom: usernameFrom,
+		UserName:     username,
+		Password:     tempPassword,
 	}
 
 	requestBody, err := json.Marshal(userData)
 	if err != nil {
 		return "", fmt.Errorf("failed to marshal user data: %v", err)
-	}
-
-	if err := getCSRFToken(); err != nil {
-		return "", err
 	}
 
 	csrfToken := os.Getenv(csrfTokenEnv)
@@ -59,6 +56,11 @@ func createUser(username string) (string, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusCreated {
+		// Optional: Read and log response body for more details
+		var respBody bytes.Buffer
+		if _, err := respBody.ReadFrom(resp.Body); err == nil {
+			return "", fmt.Errorf("failed to create user: %s, response: %s", resp.Status, respBody.String())
+		}
 		return "", fmt.Errorf("failed to create user: %s", resp.Status)
 	}
 

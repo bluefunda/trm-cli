@@ -6,14 +6,15 @@ import (
 )
 
 // createCmd represents the create command under sap-user
-var createCmd = &cobra.Command{
-	Use:   "create [username]",
+var cloneCmd = &cobra.Command{
+	Use:   "clone [usernameFrom] [username]",
 	Short: "Create a new SAP user",
-	Args:  cobra.ExactArgs(1), // Expect exactly one argument
+	Args:  cobra.ExactArgs(2), // Expect exactly 2 argument
 	Run: func(cmd *cobra.Command, args []string) {
-		username := args[0]
+		usernameFrom := args[0]
+		username := args[1]
 		// Call the function to create the user
-		response, err := createUser(username)
+		response, err := cloneUser(usernameFrom, username)
 		if err != nil {
 			fmt.Println("Error:", err)
 		} else {
@@ -24,7 +25,7 @@ var createCmd = &cobra.Command{
 
 func init() {
 	// Add createCmd as a subcommand of sapUserCmd
-	sapUserCmd.AddCommand(createCmd)
+	sapUserCmd.AddCommand(cloneCmd)
 
 	// Add sapUserCmd as a subcommand of rootCmd
 	rootCmd.AddCommand(sapUserCmd)
