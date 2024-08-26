@@ -4,15 +4,46 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
-const configFilePath = "config/config.env"
+var configPath = filepath.Join(getHomeDir(), ".config", "bda", "token")
 
-// ReadConfig reads configuration from the .env file
-func readConfig() (map[string]string, error) {
+func getHomeDir() string {
+	if home := os.Getenv("HOME"); home != "" {
+		return home
+	}
+	return os.Getenv("USERPROFILE") // for Windows
+}
+
+// EnsureConfigDir ensures that the directory for the config file exists
+func ensureConfigDir() error {
+	dir := filepath.Dir(configPath)
+
+	// Check if the directory already exists
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		// Prompt the user for permission to create the directory
+		fmt.Printf("Directory %s does not exist. Do you want to create it? (y/n): ", dir)
+		var response string
+		fmt.Scanln(&response)
+		if strings.ToLower(response) != "y" {
+			return fmt.Errorf("user did not grant permission to create directory")
+		}
+
+		// Create the directory
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return fmt.Errorf("error creating config directory: %v", err)
+		}
+		fmt.Println("Directory created successfully")
+	}
+	return nil
+}
+
+// ReadConfig reads configuration from the token file
+func readConfigPath() (map[string]string, error) {
 	config := make(map[string]string)
-	file, err := os.Open(configFilePath)
+	file, err := os.Open(configPath)
 	if err != nil {
 		return nil, err
 	}
@@ -40,9 +71,9 @@ func readConfig() (map[string]string, error) {
 	return config, nil
 }
 
-// WriteConfig writes configuration to the .env file
-func writeConfig(config map[string]string) error {
-	file, err := os.Create(configFilePath)
+// WriteConfig writes configuration to the token file
+func writeConfigPath(config map[string]string) error {
+	file, err := os.Create(configPath)
 	if err != nil {
 		return err
 	}
@@ -58,15 +89,26 @@ func writeConfig(config map[string]string) error {
 	return writer.Flush()
 }
 
-// UpdateToken updates the BDA_TRM_TOKEN in the config file
+// UpdateToken updates the BDA_TRM_TOKEN in the config file, creating the file if it doesn't exist
 func UpdateToken(newToken string) error {
-	// Check if the config file exists
-	if _, err := os.Stat(configFilePath); os.IsNotExist(err) {
-		return fmt.Errorf("config file does not exist: %v", err)
+	// Ensure the config directory exists
+	if err := ensureConfigDir(); err != nil {
+		return fmt.Errorf("error ensuring config directory: %v", err)
+	}
+
+	// Check if the config file exists, and create it if it doesn't
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		fmt.Println("Config file does not exist. Creating a new one.")
+		// Create an empty config map
+		config := make(map[string]string)
+		// Set the new token
+		config["BDA_TRM_TOKEN"] = newToken
+		// Write the new config file
+		return writeConfigPath(config)
 	}
 
 	// Read existing config
-	config, err := readConfig()
+	config, err := readConfigPath()
 	if err != nil {
 		return fmt.Errorf("error reading config file: %v", err)
 	}
@@ -75,7 +117,7 @@ func UpdateToken(newToken string) error {
 	config["BDA_TRM_TOKEN"] = newToken
 
 	// Write updated config
-	err = writeConfig(config)
+	err = writeConfigPath(config)
 	if err != nil {
 		return fmt.Errorf("error updating config file: %v", err)
 	}
