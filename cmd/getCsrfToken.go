@@ -1,58 +1,54 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/bluefunda/trm-cli/config"
 	"net/http"
-	"os"
 )
 
 // Constants for configuration
 const (
-	csrfTokenURL = "https://example.com/api/csrf-token" // Replace with actual URL
-	csrfTokenEnv = "CSRF_TOKEN"
+	csrfTokenURL = "https://abapdev.bluefunda.com:8080/rest/apim/v1/csrf-token" // Replace with actual URL
 )
 
-// getCSRFToken retrieves the CSRF token from the API and stores it in an environment variable
-func getCSRFToken() error {
+// getCSRFToken retrieves the CSRF token from the API and returns it as a string
+func getCSRFToken() (string, error) {
+	// Create a new HTTP request
 	req, err := http.NewRequest(http.MethodGet, csrfTokenURL, nil)
 	if err != nil {
-		return fmt.Errorf("failed to create request: %v", err)
+		return "", fmt.Errorf("failed to create request: %v", err)
 	}
 
-	req.Header.Set("X-CSRF-Token", "fetch")
+	// Read the token from the config
+	bearerToken, err := config.ReadToken()
+	if err != nil {
+		return "", fmt.Errorf("failed to retrieve access token from env file: %w", err)
+	}
 
+	// Set the Authorization header with Bearer token
+	req.Header.Set("Authorization", "Bearer "+bearerToken)
+
+	// Set the header to fetch the CSRF token
+	req.Header.Set("X-Csrf-Token", "fetch")
+
+	// Assuming httpClient is already defined
 	resp, err := httpClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("failed to send request: %v", err)
+		return "", fmt.Errorf("failed to send request: %v", err)
 	}
 	defer resp.Body.Close()
 
+	// Check if the response status code is OK
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to retrieve CSRF token: %s", resp.Status)
+		return "", fmt.Errorf("failed to retrieve CSRF token: %s", resp.Status)
 	}
 
-	var tokenResponse struct {
-		Token string `json:"token"`
+	// Retrieve the CSRF token from the response headers
+	csrfToken := resp.Header.Get("X-Csrf-Token")
+	if csrfToken == "" {
+		return "", fmt.Errorf("CSRF token is empty")
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&tokenResponse); err != nil {
-		return fmt.Errorf("failed to decode CSRF token response: %v", err)
-	}
-
-	if tokenResponse.Token == "" {
-		return fmt.Errorf("CSRF token is empty")
-	}
-
-	if err := os.Setenv(csrfTokenEnv, tokenResponse.Token); err != nil {
-		return fmt.Errorf("failed to set CSRF token environment variable: %v", err)
-	}
-
-	// Optionally verify that the environment variable is set correctly
-	if token := os.Getenv(csrfTokenEnv); token != tokenResponse.Token {
-		return fmt.Errorf("unexpected value for CSRF token environment variable")
-	}
-
-	fmt.Println("CSRF token retrieved and set successfully")
-	return nil
+	// Return the CSRF token
+	return csrfToken, nil
 }

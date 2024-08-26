@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"github.com/bluefunda/trm-cli/config"
 	"io"
 	"net/http"
 	"net/url"
@@ -57,10 +58,14 @@ func login(username, password string) error {
 		if err != nil {
 			return fmt.Errorf("failed to parse token response: %v", err)
 		}
-		if err := os.Setenv("BDA_TRM_TOKEN", token); err != nil {
-			return fmt.Errorf("failed to set environment variable: %v", err)
+
+		// Call UpdateToken from the external module
+		if err := config.UpdateToken(token); err != nil {
+			return fmt.Errorf("failed to update token in config file: %w", err)
 		}
+
 		fmt.Println("Login response:", string(body))
+		fmt.Println("Token updated successfully!")
 		return nil
 	}
 
@@ -68,11 +73,11 @@ func login(username, password string) error {
 }
 
 func parseTokenResponse(responseBody []byte) (string, error) {
-	type TokenResponse struct {
+	type tokenResponse struct {
 		AccessToken string `json:"access_token"`
 	}
 
-	var tokenRes TokenResponse
+	var tokenRes tokenResponse
 	if err := json.Unmarshal(responseBody, &tokenRes); err != nil {
 		return "", fmt.Errorf("failed to parse token response: %v", err)
 	}

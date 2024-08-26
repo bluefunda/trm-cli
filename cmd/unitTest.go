@@ -1,0 +1,76 @@
+package cmd
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"github.com/bluefunda/trm-cli/config"
+	"io"
+	"net/http"
+)
+
+// sendRequest sends a POST request with the given package name
+func unitTest(pkg string) (string, error) {
+	// URL to send the request to
+	const url = "https://abapdev.bluefunda.com:8080/rest/git/sap/v1/unit-test"
+
+	// RequestBody represents the structure of the data to be sent in the request body
+	type request struct {
+		ObjectName []string `json:"objectName"`
+		Package    string   `json:"package"`
+	}
+
+	// Create the request body with hardcoded objectName and dynamic package
+	requestData := request{
+		ObjectName: []string{},
+		Package:    pkg,
+	}
+
+	// Marshal the request data to JSON
+	requestBody, err := json.Marshal(requestData)
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal request data: %v", err)
+	}
+
+	// Create a new POST request with the JSON body
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(requestBody))
+	if err != nil {
+		return "", fmt.Errorf("failed to create request: %v", err)
+	}
+	//get csrf token
+	token, err := getCSRFToken()
+	if err != nil {
+		return "", fmt.Errorf("failed to retrieve CSRF token: %w", err)
+	}
+
+	// Read the token from the config
+	bearerToken, err := config.ReadToken()
+	if err != nil {
+		return "", fmt.Errorf("failed to retrieve access token from env file: %w", err)
+	}
+
+	// Set the Authorization header with Bearer token
+	req.Header.Set("Authorization", "Bearer "+bearerToken)
+	// Set necessary headers
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("x-csrf-token", token)
+
+	// Send the request
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to send request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// Read and handle the response
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("failed to read response body: %v", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("request failed with status: %s, response: %s", resp.Status, string(respBody))
+	}
+
+	return string(respBody), nil
+}

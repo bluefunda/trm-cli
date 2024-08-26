@@ -5,27 +5,17 @@ import (
 	"github.com/bluefunda/trm-cli/config"
 	"io"
 	"net/http"
-	"net/url"
 )
 
-// Base URL for fetching users
+// Base URL for fetching repository information
 const (
-	baseUserURL = "https://abapdev.bluefunda.com:8080/rest/apim/v1/system/users"
+	baseRepoURL = "https://abapdev.bluefunda.com:8080/rest/git/sap/v1/repo"
 )
 
-// fetchUsers fetches users data or a specific user if userID is provided
-func fetchUsers(userID string) (string, error) {
-	// Construct the URL based on whether userID is provided
-	var requestURL string
-	if userID == "all" {
-		// Fetch all users
-		requestURL = baseUserURL
-	} else {
-		// Fetch specific user
-		// Escape the userID to be URL-safe
-		escapedUserID := url.QueryEscape(userID)
-		requestURL = fmt.Sprintf("%s?userName=%s", baseUserURL, escapedUserID)
-	}
+// fetchRepo fetches all repository data
+func fetchRepo() (string, error) {
+	// Use the base URL to fetch all repositories
+	requestURL := baseRepoURL
 
 	// Create a new HTTP request
 	req, err := http.NewRequest("GET", requestURL, nil)

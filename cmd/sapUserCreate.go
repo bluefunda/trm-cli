@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/bluefunda/trm-cli/config"
+	"io"
 	"net/http"
-	"os"
 )
 
 // HTTPClient is a reusable HTTP client instance
@@ -35,13 +36,9 @@ func createUser(username string) (string, error) {
 		return "", fmt.Errorf("failed to marshal user data: %v", err)
 	}
 
-	if err := getCSRFToken(); err != nil {
-		return "", err
-	}
-
-	csrfToken := os.Getenv(csrfTokenEnv)
-	if csrfToken == "" {
-		return "", fmt.Errorf("CSRF token environment variable %s not set", csrfTokenEnv)
+	token, err := getCSRFToken()
+	if err != nil {
+		return "", fmt.Errorf("failed to retrieve CSRF token: %w", err)
 	}
 
 	req, err := http.NewRequest(http.MethodPost, baseURL, bytes.NewBuffer(requestBody))
@@ -49,8 +46,17 @@ func createUser(username string) (string, error) {
 		return "", fmt.Errorf("failed to create request: %v", err)
 	}
 
+	// Read the token from the config
+	bearerToken, err := config.ReadToken()
+	if err != nil {
+		return "", fmt.Errorf("failed to retrieve access token from env file: %w", err)
+	}
+
+	// Set the Authorization header with Bearer token
+	req.Header.Set("Authorization", "Bearer "+bearerToken)
+
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-CSRF-Token", csrfToken)
+	req.Header.Set("x-csrf-token", token)
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
@@ -59,7 +65,8 @@ func createUser(username string) (string, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusCreated {
-		return "", fmt.Errorf("failed to create user: %s", resp.Status)
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("failed to create user: %s, response: %s", resp.Status, string(bodyBytes))
 	}
 
 	return "User created successfully", nil

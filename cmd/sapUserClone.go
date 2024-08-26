@@ -5,15 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 )
 
 // cloneUser creates a new user with the provided username and returns a response message
 func cloneUser(usernameFrom, username string) (string, error) {
 	// Define constants for environment variables and URLs
 	const (
-		csrfTokenEnv = "CSRF_TOKEN"
-		baseURL      = "https://abapdev.bluefunda.com:8080/rest/apim/v1/system/users"
+		baseURL = "https://abapdev.bluefunda.com:8080/rest/apim/v1/system/users"
 	)
 
 	// Define your User struct
@@ -36,9 +34,9 @@ func cloneUser(usernameFrom, username string) (string, error) {
 		return "", fmt.Errorf("failed to marshal user data: %v", err)
 	}
 
-	csrfToken := os.Getenv(csrfTokenEnv)
-	if csrfToken == "" {
-		return "", fmt.Errorf("CSRF token environment variable %s not set", csrfTokenEnv)
+	token, err := getCSRFToken()
+	if err != nil {
+		return "", fmt.Errorf("failed to retrieve CSRF token: %w", err)
 	}
 
 	req, err := http.NewRequest(http.MethodPost, baseURL, bytes.NewBuffer(requestBody))
@@ -47,7 +45,7 @@ func cloneUser(usernameFrom, username string) (string, error) {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-CSRF-Token", csrfToken)
+	req.Header.Set("X-CSRF-Token", token)
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
