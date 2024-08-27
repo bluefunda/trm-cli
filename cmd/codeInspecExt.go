@@ -29,7 +29,7 @@ var codeInspectCmd = &cobra.Command{
 		if err != nil {
 			fmt.Println("Error:", err)
 		} else {
-			fmt.Println("Response:", response)
+			fmt.Println(response)
 		}
 	},
 }

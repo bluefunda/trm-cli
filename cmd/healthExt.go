@@ -15,7 +15,7 @@ var healthCmd = &cobra.Command{
 		if err != nil {
 			fmt.Println("Error:", err)
 		} else {
-			fmt.Println("Health check ok:", response)
+			fmt.Println(response)
 		}
 	},
 }

@@ -23,7 +23,7 @@ var readCmd = &cobra.Command{
 		if err != nil {
 			fmt.Println("Error:", err)
 		} else {
-			fmt.Println("Users:", response)
+			fmt.Println(response)
 		}
 	},
 }
