@@ -59,8 +59,13 @@ func login(username, password string) error {
 			return fmt.Errorf("failed to parse token response: %v", err)
 		}
 
-		// Call UpdateToken from the external module
-		if err := config.UpdateToken(token); err != nil {
+		// Create a map with the key-value pair(s)
+		envVars := map[string]string{
+			"BDA_TRM_TOKEN": token,
+		}
+
+		// Call UpdateEnvVars with the map
+		if err := config.UpdateEnvVars("login", envVars); err != nil {
 			return fmt.Errorf("failed to update token in config file: %w", err)
 		}
 

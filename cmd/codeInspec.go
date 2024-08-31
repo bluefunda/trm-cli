@@ -47,7 +47,7 @@ func codeInspect(pkg string, objNames []string) (string, error) {
 	}
 
 	// Read the token from the config
-	bearerToken, err := config.ReadToken()
+	bearerToken, err := config.ReadToken("token")
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve access token from env file: %w", err)
 	}

@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-// Define configPath globally
-var configFilePath = filepath.Join(getDir(), ".config", "bda", "token")
+// Define the base directory globally
+var baseDir = filepath.Join(getDir(), ".config", "bda")
 
 func getDir() string {
 	if home := os.Getenv("HOME"); home != "" {
@@ -18,10 +18,12 @@ func getDir() string {
 	return os.Getenv("USERPROFILE") // for Windows
 }
 
-// ReadPath reads configuration from the token file
-func readPath() (map[string]string, error) {
+// readPath reads configuration from the specified file in the base directory
+func readPath(fileName string) (map[string]string, error) {
 	config := make(map[string]string)
-	file, err := os.Open(configFilePath)
+	filePath := filepath.Join(baseDir, fileName)
+
+	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -49,17 +51,71 @@ func readPath() (map[string]string, error) {
 	return config, nil
 }
 
-// GetToken retrieves the token value from the configuration file
-func ReadToken() (string, error) {
-	config, err := readPath()
+// ReadToken reads a token or key from the specified file and returns a map with the value
+func ReadToken(input string) (string, error) {
+	var fileName string
+	// Determine the file name based on the input
+	switch input {
+	case "token":
+		fileName = "token"
+	case "key":
+
+		fileName = "key"
+	case "repo":
+		fileName = "repo"
+	case "gitUser":
+		fileName = "gitUser"
+	default:
+		return "", errors.New("invalid input specified")
+	}
+
+	config, err := readPath(fileName)
 	if err != nil {
 		return "", err
 	}
 
-	token, exists := config["BDA_TRM_TOKEN"]
-	if !exists {
-		return "", errors.New("token not found in configuration")
+	// Return the relevant configuration
+	switch input {
+	case "token":
+		// If input is empty, return only the BDA_TRM_TOKEN value
+		if token, exists := config["BDA_TRM_TOKEN"]; exists {
+			return token, nil
+		}
+		return "", errors.New("BDA_TRM_TOKEN not found in configuration")
+	case "key":
+		// If input is "key", return the KEY value
+		if key, exists := config["KEY"]; exists {
+			return key, nil
+		}
+	case "gitUser":
+		// If input is "key", return the KEY value
+		if key, exists := config["GIT_USER"]; exists {
+			return key, nil
+		}
+		return "", errors.New("KEY not found in configuration")
 	}
 
-	return token, nil
+	return "", errors.New("unexpected error occurred")
+}
+
+// ReadRepoConfig reads repository configuration from the specified file and returns a map with key-value pairs
+func ReadRepoConfig() (map[string]string, error) {
+	fileName := "repo"
+
+	config, err := readPath(fileName)
+	if err != nil {
+		return nil, err
+	}
+
+	// Return FILE_DATA, FILE_NAME, OBJECT_NAME, FILE_PATH, and KEY
+	envVars := make(map[string]string)
+	keys := []string{"FILE_DATA", "FILE_NAME", "OBJECT_NAME", "FILE_PATH", "KEY"}
+	for _, key := range keys {
+		if value, exists := config[key]; exists {
+			envVars[key] = value
+		} else {
+			return nil, errors.New(key + " not found in configuration")
+		}
+	}
+	return envVars, nil
 }

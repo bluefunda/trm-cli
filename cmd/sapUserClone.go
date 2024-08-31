@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/bluefunda/trm-cli/config"
 	"net/http"
 )
 
@@ -43,6 +44,15 @@ func cloneUser(usernameFrom, username string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to create request: %v", err)
 	}
+
+	// Read the token from the config
+	bearerToken, err := config.ReadToken("token")
+	if err != nil {
+		return "", fmt.Errorf("failed to retrieve access token from env file: %w", err)
+	}
+
+	// Set the Authorization header with Bearer token
+	req.Header.Set("Authorization", "Bearer "+bearerToken)
 
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-CSRF-Token", token)
