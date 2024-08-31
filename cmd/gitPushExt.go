@@ -18,17 +18,20 @@ var gitPush = &cobra.Command{
 			return
 		}
 
-		fmt.Print("Enter your password: ")
-		password := promptInput("Enter gitHub password: ")
+		password := promptInput("Enter GitHub password: ")
 		authorName := promptInput("Enter author name: ")
 		authorEmail := promptInput("Enter author email: ")
 		comment := promptInput("Enter comment: ")
 
 		// Call the function to push the changes
-		err = pushGit(username, password, authorName, authorEmail, comment)
+		statusCode, err := pushGit(username, password, authorName, authorEmail, comment)
 		if err != nil {
-			fmt.Println("Error pushing to Git:", err)
+			fmt.Printf("Error pushing to Git: %v\n", err)
+			return
 		}
+
+		// Handle the status code
+		fmt.Printf("Push successful. HTTP Status Code: %d\n", statusCode)
 	},
 }
 

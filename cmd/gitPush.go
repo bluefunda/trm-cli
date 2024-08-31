@@ -50,16 +50,16 @@ func promptInput(prompt string) string {
 	return strings.TrimSpace(input)
 }
 
-func pushGit(username, password, authorName, authorEmail, comment string) error {
+func pushGit(username, password, authorName, authorEmail, comment string) (int, error) {
 	// Retrieve repo data from configuration or other methods
 	repoConfig, err := config.ReadRepoConfig() // Assume this function exists to read repo config data
 	if err != nil {
-		return fmt.Errorf("error reading repo config: %v", err)
+		return 0, fmt.Errorf("error reading repo config: %v", err)
 	}
 
 	key, err := config.ReadToken("key")
 	if err != nil {
-		return fmt.Errorf("error reading key: %v", err)
+		return 0, fmt.Errorf("error reading key: %v", err)
 	}
 
 	// Split semicolon-separated values into slices
@@ -100,25 +100,25 @@ func pushGit(username, password, authorName, authorEmail, comment string) error 
 	// Marshal the request body to JSON
 	jsonData, err := json.Marshal(requestBody)
 	if err != nil {
-		return fmt.Errorf("error marshaling JSON: %v", err)
+		return 0, fmt.Errorf("error marshaling JSON: %v", err)
 	}
 
 	// Retrieve the CSRF token
 	token, err := getCSRFToken() // Define this function to get the CSRF token
 	if err != nil {
-		return fmt.Errorf("failed to retrieve CSRF token: %w", err)
+		return 0, fmt.Errorf("failed to retrieve CSRF token: %w", err)
 	}
 
 	// Read the token from the config
 	bearerToken, err := config.ReadToken("token")
 	if err != nil {
-		return fmt.Errorf("failed to retrieve access token from env file: %w", err)
+		return 0, fmt.Errorf("failed to retrieve access token from env file: %w", err)
 	}
 
 	// Create a new request
 	req, err := http.NewRequest(http.MethodPost, pushURL, bytes.NewBuffer(jsonData))
 	if err != nil {
-		return fmt.Errorf("error creating request: %v", err)
+		return 0, fmt.Errorf("error creating request: %v", err)
 	}
 
 	// Set the Authorization header with Bearer token
@@ -131,16 +131,16 @@ func pushGit(username, password, authorName, authorEmail, comment string) error 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("error making POST request: %v", err)
+		return 0, fmt.Errorf("error making POST request: %v", err)
 	}
 	defer resp.Body.Close()
 
 	// Read and print the response
 	responseData, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("error reading response: %v", err)
+		return resp.StatusCode, fmt.Errorf("error reading response: %v", err)
 	}
 
 	fmt.Println("Response:", string(responseData))
-	return nil
+	return resp.StatusCode, nil
 }
