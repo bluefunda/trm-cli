@@ -59,7 +59,6 @@ func ReadToken(input string) (string, error) {
 	case "token":
 		fileName = "token"
 	case "key":
-
 		fileName = "key"
 	case "repo":
 		fileName = "repo"
@@ -77,45 +76,46 @@ func ReadToken(input string) (string, error) {
 	// Return the relevant configuration
 	switch input {
 	case "token":
-		// If input is empty, return only the BDA_TRM_TOKEN value
 		if token, exists := config["BDA_TRM_TOKEN"]; exists {
 			return token, nil
 		}
 		return "", errors.New("BDA_TRM_TOKEN not found in configuration")
 	case "key":
-		// If input is "key", return the KEY value
 		if key, exists := config["KEY"]; exists {
 			return key, nil
 		}
-	case "gitUser":
-		// If input is "key", return the KEY value
-		if key, exists := config["GIT_USER"]; exists {
-			return key, nil
-		}
 		return "", errors.New("KEY not found in configuration")
+	case "gitUser":
+		if user, exists := config["GIT_USER"]; exists {
+			return user, nil
+		}
+		return "", errors.New("GIT_USER not found in configuration")
 	}
 
 	return "", errors.New("unexpected error occurred")
 }
 
-// ReadRepoConfig reads repository configuration from the specified file and returns a map with key-value pairs
-func ReadRepoConfig() (map[string]string, error) {
+// RepoConfig holds the repository configuration
+type RepoConfig struct {
+	Path     string
+	Filename string
+	Data     string
+	Package  string
+}
+
+// ReadRepoConfig reads repository configuration from the specified file and returns a RepoConfig struct
+func ReadRepoConfig() (RepoConfig, error) {
 	fileName := "repo"
 
 	config, err := readPath(fileName)
 	if err != nil {
-		return nil, err
+		return RepoConfig{}, err
 	}
 
-	// Return FILE_DATA, FILE_NAME, OBJECT_NAME, FILE_PATH, and KEY
-	envVars := make(map[string]string)
-	keys := []string{"FILE_DATA", "FILE_NAME", "OBJECT_NAME", "FILE_PATH", "KEY"}
-	for _, key := range keys {
-		if value, exists := config[key]; exists {
-			envVars[key] = value
-		} else {
-			return nil, errors.New(key + " not found in configuration")
-		}
-	}
-	return envVars, nil
+	return RepoConfig{
+		Path:     config["FILE_PATH"],
+		Filename: config["FILE_NAME"],
+		Data:     config["FILE_DATA"],
+		Package:  config["OBJECT_NAME"],
+	}, nil
 }
