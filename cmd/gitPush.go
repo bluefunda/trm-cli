@@ -81,20 +81,28 @@ func pushGit(username, password, authorName, authorEmail, comment string) (int, 
 
 	// Loop through the slices and populate RepoData
 	for i := range paths {
-		repoData := struct {
-			Filename   string `json:"filename"`
-			Key        string `json:"key"`
-			BranchName string `json:"branchName"`
-			Package    string `json:"package"`
-			Data       string `json:"data"`
-		}{
-			Filename:   filenames[i],
-			Key:        key,
-			BranchName: "mvp-1",            // Or fetch the branch name from the repo config
-			Package:    repoConfig.Package, // Assuming Package is not semicolon-separated
-			Data:       datas[i],
+		// Check if the current index is valid for filenames, datas, and paths slices
+		if i < len(filenames) && i < len(datas) && i < len(paths) {
+			repoData := struct {
+				Filename   string `json:"filename"`
+				Key        string `json:"key"`
+				BranchName string `json:"branchName"`
+				Package    string `json:"package"`
+				Data       string `json:"data"`
+			}{
+				Filename:   filenames[i],
+				Key:        key,
+				BranchName: "mvp-1", // Or fetch the branch name from the repo config
+				Package:    "",      // Assuming Package is not semicolon-separated
+				Data:       datas[i],
+			}
+
+			// Assign the current path to the Path field in repoData
+			requestBody.Path = paths[i]
+
+			// Add repoData to the requestBody's RepoData slice
+			requestBody.RepoData = append(requestBody.RepoData, repoData)
 		}
-		requestBody.RepoData = append(requestBody.RepoData, repoData)
 	}
 
 	// Marshal the request body to JSON
@@ -140,6 +148,16 @@ func pushGit(username, password, authorName, authorEmail, comment string) (int, 
 	if err != nil {
 		return resp.StatusCode, fmt.Errorf("error reading response: %v", err)
 	}
+
+	// Print the request body for debugging
+	// Pretty-print the request body for debugging
+	prettyJSON, err := json.MarshalIndent(requestBody, "", "  ")
+	if err != nil {
+		fmt.Printf("error pretty printing JSON: %v\n", err)
+		return resp.StatusCode, nil
+	}
+
+	fmt.Println("RequestBody:", string(prettyJSON))
 
 	fmt.Println("Response:", string(responseData))
 	return resp.StatusCode, nil
