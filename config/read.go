@@ -97,10 +97,11 @@ func ReadToken(input string) (string, error) {
 
 // RepoConfig holds the repository configuration
 type RepoConfig struct {
-	Path     string
-	Filename string
-	Data     string
-	Package  string
+	Path       string
+	Filename   string
+	Data       string
+	ObjectName string
+	Package    string
 }
 
 // ReadRepoConfig reads repository configuration from the specified file and returns a RepoConfig struct
@@ -113,9 +114,10 @@ func ReadRepoConfig() (RepoConfig, error) {
 	}
 
 	return RepoConfig{
-		Path:     config["FILE_PATH"],
-		Filename: config["FILE_NAME"],
-		Data:     config["FILE_DATA"],
-		Package:  config["OBJECT_NAME"],
+		Path:       config["FILE_PATH"],
+		Filename:   config["FILE_NAME"],
+		Data:       config["FILE_DATA"],
+		ObjectName: config["OBJECT_NAME"],
+		Package:    config["PACKAGE"],
 	}, nil
 }

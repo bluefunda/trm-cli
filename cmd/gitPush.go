@@ -66,10 +66,11 @@ func pushGit(username, password, authorName, authorEmail, comment string) (int, 
 	paths := strings.Split(repoConfig.Path, ";")
 	filenames := strings.Split(repoConfig.Filename, ";")
 	datas := strings.Split(repoConfig.Data, ";")
+	packages := strings.Split(repoConfig.Package, ";") // Split the Package field by comma
 
 	// Prepare the request body
 	requestBody := PostRequestBody{
-		URL: "https://github.com/bluefunda/abap-git.git", // This should be set according to your repo data
+		URL: "https://github.com/bluefunda/abap-apim.git", // This should be set according to your repo data
 	}
 	requestBody.Credentials.Username = username
 	requestBody.Credentials.Password = password
@@ -81,8 +82,8 @@ func pushGit(username, password, authorName, authorEmail, comment string) (int, 
 
 	// Loop through the slices and populate RepoData
 	for i := range paths {
-		// Check if the current index is valid for filenames, datas, and paths slices
-		if i < len(filenames) && i < len(datas) && i < len(paths) {
+		// Check if the current index is valid for filenames, datas, paths, and packages slices
+		if i < len(filenames) && i < len(datas) && i < len(paths) && i < len(packages) {
 			repoData := struct {
 				Filename   string `json:"filename"`
 				Key        string `json:"key"`
@@ -92,8 +93,8 @@ func pushGit(username, password, authorName, authorEmail, comment string) (int, 
 			}{
 				Filename:   filenames[i],
 				Key:        key,
-				BranchName: "mvp-1", // Or fetch the branch name from the repo config
-				Package:    "",      // Assuming Package is not semicolon-separated
+				BranchName: "mvp-1",     // Or fetch the branch name from the repo config
+				Package:    packages[i], // Use the corresponding package value
 				Data:       datas[i],
 			}
 
@@ -124,7 +125,7 @@ func pushGit(username, password, authorName, authorEmail, comment string) (int, 
 	}
 
 	// Create a new request
-	req, err := http.NewRequest(http.MethodPost, pushURL, bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("POST", pushURL, bytes.NewBuffer(jsonData))
 	if err != nil {
 		return 0, fmt.Errorf("error creating request: %v", err)
 	}

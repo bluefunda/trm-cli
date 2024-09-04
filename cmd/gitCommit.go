@@ -25,11 +25,16 @@ type ItemData struct {
 	ObjectName string `json:"objectName"`
 }
 
+type StatusData struct {
+	Package string `json:"package"`
+}
+
 // ApiResponse represents the structure of the entire API response
 type ApiResponse struct {
 	ApiResult []struct {
-		File FileData `json:"file"`
-		Item ItemData `json:"item"`
+		File   FileData   `json:"file"`
+		Item   ItemData   `json:"item"`
+		Status StatusData `json:"status"`
 	} `json:"apiResult"`
 }
 
@@ -109,13 +114,17 @@ func StoreData(objectName, username, password string) error {
 	}
 
 	// Collect data in slices
-	var fileDataList, fileNameList, objectNameList, filePathList []string
+	var fileDataList, fileNameList, objectNameList, filePathList, packageList []string
 	for _, result := range apiResponse.ApiResult {
 		if objectName == "." || result.Item.ObjectName == objectName {
 			fileDataList = append(fileDataList, result.File.Data)
 			fileNameList = append(fileNameList, result.File.Filename)
 			objectNameList = append(objectNameList, result.Item.ObjectName)
 			filePathList = append(filePathList, result.File.Path)
+
+			// Assuming that package information can be retrieved from result.File or result.Item
+			// If package information is part of the FileData structure
+			packageList = append(packageList, result.Status.Package) // Replace with actual field if needed
 		}
 	}
 
@@ -125,6 +134,7 @@ func StoreData(objectName, username, password string) error {
 		"FILE_NAME":   strings.Join(fileNameList, ";"),
 		"OBJECT_NAME": strings.Join(objectNameList, ";"),
 		"FILE_PATH":   strings.Join(filePathList, ";"),
+		"PACKAGE":     strings.Join(packageList, ";"), // Adding package information
 	}
 
 	// Update the configuration
