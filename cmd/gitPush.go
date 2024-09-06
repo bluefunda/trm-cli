@@ -63,7 +63,7 @@ func pushGit(username, password, authorName, authorEmail, comment string) (int, 
 		return 0, fmt.Errorf("error reading repo config: %v", err)
 	}
 
-	gitUrl, key, err := config.ReadKeyConfig()
+	key, gitUrl, err := config.ReadKeyConfig()
 	if err != nil {
 		return 0, fmt.Errorf("error reading key: %v", err)
 	}

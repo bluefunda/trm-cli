@@ -6,8 +6,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var setEnvVar = &cobra.Command{
+	Use:   "set",
+	Short: "set environment variable ",
+}
+
 // urlAdd represents the add command under git
-var urlAdd = &cobra.Command{
+var setUrl = &cobra.Command{
 	Use:   "url [url]",
 	Short: "Set URL",
 	Args:  cobra.ExactArgs(1), // Ensure exactly one argument is provided
@@ -50,6 +55,8 @@ func promptForConfirmation(prompt string) string {
 }
 
 func init() {
+
+	setEnvVar.AddCommand(setUrl)
 	// Add urlCmd as a subcommand of rootCmd
-	rootCmd.AddCommand(urlAdd)
+	rootCmd.AddCommand(setEnvVar)
 }
