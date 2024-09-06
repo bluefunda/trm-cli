@@ -29,24 +29,26 @@ func readPath(fileName string) (map[string]string, error) {
 	}
 	defer file.Close()
 
-	// Use bufio.Reader instead of bufio.Scanner
+	// Use bufio.Reader for handling large lines
 	reader := bufio.NewReader(file)
 
 	for {
 		line, err := reader.ReadString('\n')
 		if err != nil {
-			// End of file
+			// Handle EOF, not an actual error
 			if err.Error() == "EOF" {
 				break
 			}
-			return nil, err
+			return nil, err // Return other errors if any
 		}
 
+		// Trim spaces and skip empty lines or comments
 		line = strings.TrimSpace(line)
 		if line == "" || strings.HasPrefix(line, "#") {
-			continue // Skip empty lines and comments
+			continue
 		}
 
+		// Split key-value pair based on the first "=" found
 		parts := strings.SplitN(line, "=", 2)
 		if len(parts) != 2 {
 			continue // Ignore malformed lines
@@ -60,7 +62,6 @@ func readPath(fileName string) (map[string]string, error) {
 	return config, nil
 }
 
-// ReadToken reads a token or key from the specified file and returns a map with the value
 // ReadToken reads a token or key from the specified file and returns the value as a string
 func ReadToken(input string) (string, error) {
 	var fileName string

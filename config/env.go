@@ -3,6 +3,7 @@ package config
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -48,23 +49,30 @@ func readConfigPath(path string) (map[string]string, error) {
 	}
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if line == "" || line[0] == '#' {
-			continue
+	reader := bufio.NewReader(file)
+	for {
+		line, err := reader.ReadString('\n')
+		if err != nil && err != io.EOF {
+			return nil, err
 		}
-		parts := strings.SplitN(line, "=", 2)
-		if len(parts) != 2 {
-			continue
+		if len(line) > 0 {
+			line = strings.TrimSpace(line)
+			if line == "" || line[0] == '#' {
+				if err == io.EOF {
+					break
+				}
+				continue
+			}
+			parts := strings.SplitN(line, "=", 2)
+			if len(parts) == 2 {
+				key := strings.TrimSpace(parts[0])
+				value := strings.TrimSpace(parts[1])
+				config[key] = value
+			}
 		}
-		key := strings.TrimSpace(parts[0])
-		value := strings.TrimSpace(parts[1])
-		config[key] = value
-	}
-
-	if err := scanner.Err(); err != nil {
-		return nil, err
+		if err == io.EOF {
+			break
+		}
 	}
 
 	return config, nil
