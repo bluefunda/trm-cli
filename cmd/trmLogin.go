@@ -4,17 +4,18 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/bluefunda/trm-cli/config"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/bluefunda/trm-cli/config"
 )
 
 var (
 	clientID     = "admin-trm"
-	clientSecret = "O8xQ9P0tjMPIEJqtzEWNsqlvCwgpxt9I"
+	clientSecret = "MGJFz6BeI8gVmTqPgh16sEZEgwd6v6KV"
 )
 
 func promptForInput(prompt string) string {
