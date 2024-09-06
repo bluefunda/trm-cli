@@ -10,10 +10,14 @@ import (
 
 // cloneUser creates a new user with the provided username and returns a response message
 func cloneUser(usernameFrom, username string) (string, error) {
-	// Define constants for environment variables and URLs
-	const (
-		baseURL = "https://abapdev.bluefunda.com:8080/rest/apim/v1/system/users"
-	)
+	// Read the base URL from the environment or config file
+	baseURL, err := config.ReadToken("url")
+	if err != nil || baseURL == "" {
+		return "", fmt.Errorf("failed to retrieve base URL from config file")
+	}
+
+	// Concatenate the base URL with the endpoint
+	baseCloneURL := baseURL + "/rest/apim/v1/system/users"
 
 	// Define your User struct
 	type userclone struct {
@@ -40,7 +44,7 @@ func cloneUser(usernameFrom, username string) (string, error) {
 		return "", fmt.Errorf("failed to retrieve CSRF token: %w", err)
 	}
 
-	req, err := http.NewRequest(http.MethodPost, baseURL, bytes.NewBuffer(requestBody))
+	req, err := http.NewRequest(http.MethodPost, baseCloneURL, bytes.NewBuffer(requestBody))
 	if err != nil {
 		return "", fmt.Errorf("failed to create request: %v", err)
 	}

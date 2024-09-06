@@ -6,13 +6,16 @@ import (
 	"net/http"
 )
 
-// Constants for configuration
-const (
-	csrfTokenURL = "https://abapdev.bluefunda.com:8080/rest/apim/v1/csrf-token" // Replace with actual URL
-)
-
 // getCSRFToken retrieves the CSRF token from the API and returns it as a string
 func getCSRFToken() (string, error) {
+	// Read the base URL from the environment or config file
+	baseURL, err := config.ReadToken("url")
+	if err != nil || baseURL == "" {
+		return "", fmt.Errorf("failed to retrieve base URL from config file")
+	}
+
+	// Concatenate the base URL with the endpoint
+	csrfTokenURL := baseURL + "/rest/apim/v1/csrf-token"
 	// Create a new HTTP request
 	req, err := http.NewRequest(http.MethodGet, csrfTokenURL, nil)
 	if err != nil {

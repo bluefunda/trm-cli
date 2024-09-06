@@ -13,8 +13,6 @@ import (
 	"github.com/bluefunda/trm-cli/config"
 )
 
-const pushURL = "https://abapdev.bluefunda.com:8080/rest/git/sap/v1/push"
-
 // PostRequestBody represents the structure of the request body
 type PostRequestBody struct {
 	Credentials struct {
@@ -51,13 +49,21 @@ func promptInput(prompt string) string {
 }
 
 func pushGit(username, password, authorName, authorEmail, comment string) (int, error) {
+	// Read the base URL from the environment or config file
+	baseURL, err := config.ReadToken("url")
+	if err != nil || baseURL == "" {
+		return 0, fmt.Errorf("failed to retrieve base URL from config file")
+	}
+
+	// Concatenate the base URL with the endpoint
+	pushURL := baseURL + "/rest/git/sap/v1/push"
 	// Retrieve repo data from configuration or other methods
 	repoConfig, err := config.ReadRepoConfig() // Assume this function exists to read repo config data
 	if err != nil {
 		return 0, fmt.Errorf("error reading repo config: %v", err)
 	}
 
-	key, err := config.ReadToken("key")
+	gitUrl, key, err := config.ReadKeyConfig()
 	if err != nil {
 		return 0, fmt.Errorf("error reading key: %v", err)
 	}
@@ -70,7 +76,7 @@ func pushGit(username, password, authorName, authorEmail, comment string) (int, 
 
 	// Prepare the request body
 	requestBody := PostRequestBody{
-		URL: "https://github.com/bluefunda/abap-apim.git", // This should be set according to your repo data
+		URL: gitUrl, // This should be set according to your repo data
 	}
 	requestBody.Credentials.Username = username
 	requestBody.Credentials.Password = password

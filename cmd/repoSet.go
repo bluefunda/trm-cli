@@ -12,6 +12,7 @@ type Repository struct {
 		DisplayName string `json:"displayName"`
 	} `json:"localSettings"`
 	Key string `json:"key"`
+	URL string `json:"url"`
 }
 
 // RepoData represents the structure of the entire JSON response
@@ -19,18 +20,18 @@ type RepoData struct {
 	Repo []Repository `json:"repo"`
 }
 
-// findRepo searches for a repository by its display name and returns its key
-func findRepo(repos []Repository, repoName string) (string, error) {
+// findRepo searches for a repository by its display name and returns its key and URL
+func findRepo(repos []Repository, repoName string) (string, string, error) {
 	for _, repo := range repos {
 		if repo.LocalSettings.DisplayName == repoName {
-			return repo.Key, nil
+			return repo.Key, repo.URL, nil
 		}
 	}
-	return "", fmt.Errorf("repository with display name '%s' not found", repoName)
+	return "", "", fmt.Errorf("repository with display name '%s' not found", repoName)
 }
 
-// RepoKey fetches all repositories and finds the key for the given display name,
-// then updates the token with that key.
+// RepoKey fetches all repositories and finds the key and URL for the given display name,
+// then updates the token with that key and URL.
 func RepoKey(repoName string) error {
 	// Fetch the repository data
 	repoData, err := fetchRepo()
@@ -45,18 +46,19 @@ func RepoKey(repoName string) error {
 		return fmt.Errorf("failed to parse repository data: %w", err)
 	}
 
-	// Find the repository key by display name
-	key, err := findRepo(data.Repo, repoName)
+	// Find the repository key and URL by display name
+	key, url, err := findRepo(data.Repo, repoName)
 	if err != nil {
 		return err
 	}
 
 	// Create a map with the key-value pair(s)
 	envVars := map[string]string{
-		"KEY": key,
+		"KEY":     key,
+		"GIT_URL": url,
 	}
 
-	// Update the token with the found key
+	// Update the token with the found key and URL
 	if err := config.UpdateEnvVars("key", envVars); err != nil {
 		return fmt.Errorf("failed to update token: %w", err)
 	}

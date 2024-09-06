@@ -7,13 +7,16 @@ import (
 	"net/http"
 )
 
-// Base URL for fetching repository information
-const (
-	baseRepoURL = "https://abapdev.bluefunda.com:8080/rest/git/sap/v1/repo"
-)
-
 // fetchRepo fetches all repository data
 func fetchRepo() (string, error) {
+	// Read the base URL from the environment or config file
+	baseURL, err := config.ReadToken("url")
+	if err != nil || baseURL == "" {
+		return "", fmt.Errorf("failed to retrieve base URL from config file")
+	}
+
+	// Concatenate the base URL with the endpoint
+	baseRepoURL := baseURL + "/rest/git/sap/v1/repo"
 	// Use the base URL to fetch all repositories
 	requestURL := baseRepoURL
 

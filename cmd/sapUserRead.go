@@ -8,23 +8,26 @@ import (
 	"net/url"
 )
 
-// Base URL for fetching users
-const (
-	baseUserURL = "https://abapdev.bluefunda.com:8080/rest/apim/v1/system/users"
-)
-
 // fetchUsers fetches users data or a specific user if userID is provided
 func fetchUsers(userID string) (string, error) {
+	// Read the base URL from the environment or config file
+	baseURL, err := config.ReadToken("url")
+	if err != nil || baseURL == "" {
+		return "", fmt.Errorf("failed to retrieve base URL from config file")
+	}
+
+	// Concatenate the base URL with the endpoint
+	testUrl := baseURL + "/rest/apim/v1/system/users"
 	// Construct the URL based on whether userID is provided
 	var requestURL string
 	if userID == "all" {
 		// Fetch all users
-		requestURL = baseUserURL
+		requestURL = testUrl
 	} else {
 		// Fetch specific user
 		// Escape the userID to be URL-safe
 		escapedUserID := url.QueryEscape(userID)
-		requestURL = fmt.Sprintf("%s?userName=%s", baseUserURL, escapedUserID)
+		requestURL = fmt.Sprintf("%s?userName=%s", testUrl, escapedUserID)
 	}
 
 	// Create a new HTTP request

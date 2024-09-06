@@ -13,7 +13,7 @@ var sapUserCmd = &cobra.Command{
 
 // readCmd represents the read command under sap-user
 var readCmd = &cobra.Command{
-	Use:   "read [input]",
+	Use:   "read [input]", // input 'all' to read all users or pass username
 	Short: "Read SAP users based on input",
 	Args:  cobra.ExactArgs(1), // Expect exactly one argument
 	Run: func(cmd *cobra.Command, args []string) {

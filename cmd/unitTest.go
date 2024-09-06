@@ -11,8 +11,14 @@ import (
 
 // sendRequest sends a POST request with the given package name
 func unitTest(pkg string) (string, error) {
-	// URL to send the request to
-	const url = "https://abapdev.bluefunda.com:8080/rest/git/sap/v1/unit-test"
+	// Read the base URL from the environment or config file
+	baseURL, err := config.ReadToken("url")
+	if err != nil || baseURL == "" {
+		return "", fmt.Errorf("failed to retrieve base URL from config file")
+	}
+
+	// Concatenate the base URL with the endpoint
+	url := baseURL + "/rest/git/sap/v1/unit-test"
 
 	// RequestBody represents the structure of the data to be sent in the request body
 	type request struct {

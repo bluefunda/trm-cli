@@ -11,8 +11,6 @@ import (
 	"strings"
 )
 
-const stageURL = "https://abapdev.bluefunda.com:8080/rest/git/sap/v1/stage?url=https://github.com/bluefunda/abap-git.git"
-
 // FileData represents the structure of the file data in the API response
 type FileData struct {
 	Data     string `json:"data"`
@@ -88,12 +86,21 @@ func fetchData(fullURL string) (string, error) {
 
 // StoreData processes the API response and stores key-value pairs in the configuration file
 func StoreData(objectName, username, password string) error {
-	key, err := config.ReadToken("key")
-	if err != nil {
-		return fmt.Errorf("failed to retrieve repo key from env file: %w", err)
+	// Read the base URL from the environment or config file
+	baseURL, err := config.ReadToken("url")
+	if err != nil || baseURL == "" {
+		return fmt.Errorf("failed to retrieve base URL from config file")
 	}
 
-	fullURL := fmt.Sprintf("%s&username=%s&password=%s&key=%s", stageURL, username, password, key)
+	// Concatenate the base URL with the endpoint
+	stageURL := baseURL + "/rest/git/sap/v1/stage"
+
+	key, gitURL, err := config.ReadKeyConfig()
+	if err != nil {
+		return fmt.Errorf("failed to retrieve repo key from config: %w", err)
+	}
+
+	fullURL := fmt.Sprintf("%s?url=%s&username=%s&password=%s&key=%s", stageURL, gitURL, username, password, key)
 
 	// Debugging: Print the full URL
 	fmt.Println("Full URL:", fullURL)
@@ -122,19 +129,18 @@ func StoreData(objectName, username, password string) error {
 			objectNameList = append(objectNameList, result.Item.ObjectName)
 			filePathList = append(filePathList, result.File.Path)
 
-			// Assuming that package information can be retrieved from result.File or result.Item
-			// If package information is part of the FileData structure
-			packageList = append(packageList, result.Status.Package) // Replace with actual field if needed
+			// Assuming that package information can be retrieved from result.Status
+			packageList = append(packageList, result.Status.Package)
 		}
 	}
 
 	// Store the slices in envVars
 	envVars := map[string]string{
-		"FILE_DATA":   strings.Join(fileDataList, ";"), // Assuming `;` as a delimiter
+		"FILE_DATA":   strings.Join(fileDataList, ";"),
 		"FILE_NAME":   strings.Join(fileNameList, ";"),
 		"OBJECT_NAME": strings.Join(objectNameList, ";"),
 		"FILE_PATH":   strings.Join(filePathList, ";"),
-		"PACKAGE":     strings.Join(packageList, ";"), // Adding package information
+		"PACKAGE":     strings.Join(packageList, ";"),
 	}
 
 	// Update the configuration

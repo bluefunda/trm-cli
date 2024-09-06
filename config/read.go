@@ -29,41 +29,54 @@ func readPath(fileName string) (map[string]string, error) {
 	}
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if line == "" || strings.HasPrefix(line, "#") {
-			continue
+	// Use bufio.Reader instead of bufio.Scanner
+	reader := bufio.NewReader(file)
+
+	for {
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			// End of file
+			if err.Error() == "EOF" {
+				break
+			}
+			return nil, err
 		}
+
+		line = strings.TrimSpace(line)
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue // Skip empty lines and comments
+		}
+
 		parts := strings.SplitN(line, "=", 2)
 		if len(parts) != 2 {
-			continue
+			continue // Ignore malformed lines
 		}
+
 		key := strings.TrimSpace(parts[0])
 		value := strings.TrimSpace(parts[1])
 		config[key] = value
-	}
-
-	if err := scanner.Err(); err != nil {
-		return nil, err
 	}
 
 	return config, nil
 }
 
 // ReadToken reads a token or key from the specified file and returns a map with the value
+// ReadToken reads a token or key from the specified file and returns the value as a string
 func ReadToken(input string) (string, error) {
 	var fileName string
-	// Determine the file name based on the input
+	var key string
+
+	// Determine the file name and key based on the input
 	switch input {
 	case "token":
 		fileName = "token"
-	case "key":
-		fileName = "key"
-	case "repo":
-		fileName = "repo"
+		key = "BDA_TRM_TOKEN"
 	case "gitUser":
 		fileName = "gitUser"
+		key = "GIT_USER"
+	case "url":
+		fileName = "url"
+		key = "URL"
 	default:
 		return "", errors.New("invalid input specified")
 	}
@@ -73,26 +86,36 @@ func ReadToken(input string) (string, error) {
 		return "", err
 	}
 
-	// Return the relevant configuration
-	switch input {
-	case "token":
-		if token, exists := config["BDA_TRM_TOKEN"]; exists {
-			return token, nil
-		}
-		return "", errors.New("BDA_TRM_TOKEN not found in configuration")
-	case "key":
-		if key, exists := config["KEY"]; exists {
-			return key, nil
-		}
-		return "", errors.New("KEY not found in configuration")
-	case "gitUser":
-		if user, exists := config["GIT_USER"]; exists {
-			return user, nil
-		}
-		return "", errors.New("GIT_USER not found in configuration")
+	if value, exists := config[key]; exists {
+		return value, nil
 	}
 
-	return "", errors.New("unexpected error occurred")
+	return "", errors.New(key + " not found in configuration")
+}
+
+// ReadKeyConfig reads key and Git URL from the "key" configuration file
+func ReadKeyConfig() (string, string, error) {
+	fileName := "key"
+
+	config, err := readPath(fileName)
+	if err != nil {
+		return "", "", err
+	}
+
+	key, keyExists := config["KEY"]
+	gitURL, urlExists := config["GIT_URL"]
+
+	if keyExists && urlExists {
+		return key, gitURL, nil
+	}
+	if !keyExists {
+		return "", "", errors.New("KEY not found in configuration")
+	}
+	if !urlExists {
+		return "", "", errors.New("GIT_URL not found in configuration")
+	}
+
+	return "", "", errors.New("unexpected error occurred")
 }
 
 // RepoConfig holds the repository configuration

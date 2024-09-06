@@ -11,8 +11,14 @@ import (
 
 // sendRequest sends a POST request for code inspection
 func codeInspect(pkg string, objNames []string) (string, error) {
-	// URL to send the request to
-	const url = "https://abapdev.bluefunda.com:8080/rest/git/sap/v1/code-inspector"
+	// Read the base URL from the environment or config file
+	baseURL, err := config.ReadToken("url")
+	if err != nil || baseURL == "" {
+		return "", fmt.Errorf("failed to retrieve base URL from config file")
+	}
+
+	// Concatenate the base URL with the endpoint
+	url := baseURL + "/rest/git/sap/v1/code-inspector"
 
 	// RequestBody represents the structure of the data to be sent in the request body
 	type request struct {
@@ -46,7 +52,7 @@ func codeInspect(pkg string, objNames []string) (string, error) {
 		return "", fmt.Errorf("failed to retrieve CSRF token: %w", err)
 	}
 
-	// Read the token from the config
+	// Read the bearer token from the config
 	bearerToken, err := config.ReadToken("token")
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve access token from env file: %w", err)

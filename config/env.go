@@ -20,6 +20,7 @@ var (
 	repoConfigPath  = filepath.Join(getHomeDir(), ".config", "bda", "repo")
 	keyConfigPath   = filepath.Join(getHomeDir(), ".config", "bda", "key")
 	gitAuthPath     = filepath.Join(getHomeDir(), ".config", "bda", "gitUser")
+	addUrlPath      = filepath.Join(getHomeDir(), ".config", "bda", "url")
 )
 
 func ensureConfigDir(path string) error {
@@ -100,6 +101,8 @@ func UpdateEnvVars(configType string, newVars map[string]string) error {
 		configPath = keyConfigPath
 	case "gitUser":
 		configPath = gitAuthPath
+	case "url":
+		configPath = addUrlPath
 	default:
 		return fmt.Errorf("invalid config type: %s", configType)
 	}
