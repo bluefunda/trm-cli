@@ -13,13 +13,10 @@ Run following CLI commands:
 9.	Read git repository: trm repo read
 10.	Set git repository: trm repo set <repoName>
 11.	Git add: trm git add <”.” Or “objectname”>
-    
-  11.1 Enter GitHub username: <username>
-  11.2 Enter GitHub password: <password>
-  
+    11.1 Enter GitHub username: <username>
+11.2 Enter GitHub password: <password>
 12.	Git push : trm git push
-    
-  12.1 Enter GitHub password: <password>
-  12.2 Enter author name: 
-  12.3 Enter author email:
-  12.4 Enter comment:
+12.1 Enter GitHub password: <password>
+12.2 Enter author name:
+12.3 Enter author email:
+12.4 Enter comment:
