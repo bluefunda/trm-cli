@@ -25,3 +25,7 @@ Run following CLI commands:
 14.	Git add: **trm git add <**”.” or “objectname”**>**
     
 16.	Git push : **trm git push**
+
+17.	Read transport : **trm read-transport**
+
+18.	Create transport : **trm create-transport**
