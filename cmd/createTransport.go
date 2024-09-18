@@ -7,6 +7,7 @@ import (
 	"github.com/bluefunda/trm-cli/config"
 	"io"
 	"net/http"
+	"strings"
 )
 
 // TransportData represents the structure of the transport data to be sent in the request body
@@ -40,8 +41,11 @@ func createTransport(requestType, author, text string) (string, error) {
 		return "", fmt.Errorf("failed to marshal transport data: %v", err)
 	}
 
+	// Print the request body
+	fmt.Printf("Request body: %s\n", string(requestBody))
+
 	// Retrieve the CSRF token
-	token, err := getCSRFToken()
+	token, cookies, err := getCSRFToken()
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve CSRF token: %w", err)
 	}
@@ -61,7 +65,14 @@ func createTransport(requestType, author, text string) (string, error) {
 	// Set request headers
 	req.Header.Set("Authorization", "Bearer "+bearerToken)
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "*/*")
 	req.Header.Set("x-csrf-token", token)
+	// Set the cookies in the request header
+	var cookieStrings []string
+	for name, value := range cookies {
+		cookieStrings = append(cookieStrings, fmt.Sprintf("%s=%s", name, value))
+	}
+	req.Header.Set("Cookie", strings.Join(cookieStrings, "; "))
 
 	// Send the request
 	resp, err := httpClient.Do(req)

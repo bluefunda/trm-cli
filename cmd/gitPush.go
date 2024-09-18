@@ -119,7 +119,7 @@ func pushGit(username, password, authorName, authorEmail, comment string) (int, 
 	}
 
 	// Retrieve the CSRF token
-	token, err := getCSRFToken() // Define this function to get the CSRF token
+	token, cookies, err := getCSRFToken() // Define this function to get the CSRF token
 	if err != nil {
 		return 0, fmt.Errorf("failed to retrieve CSRF token: %w", err)
 	}
@@ -138,9 +138,14 @@ func pushGit(username, password, authorName, authorEmail, comment string) (int, 
 
 	// Set the Authorization header with Bearer token
 	req.Header.Set("Authorization", "Bearer "+bearerToken)
-	// Set necessary headers
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-csrf-token", token)
+	// Set the cookies in the request header
+	var cookieStrings []string
+	for name, value := range cookies {
+		cookieStrings = append(cookieStrings, fmt.Sprintf("%s=%s", name, value))
+	}
+	req.Header.Set("Cookie", strings.Join(cookieStrings, "; "))
 
 	// Make the POST request
 	client := &http.Client{}

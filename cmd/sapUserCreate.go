@@ -7,6 +7,7 @@ import (
 	"github.com/bluefunda/trm-cli/config"
 	"io"
 	"net/http"
+	"strings"
 )
 
 // HTTPClient is a reusable HTTP client instance
@@ -24,7 +25,7 @@ func createUser(username string) (string, error) {
 	baseCreateURL := baseURL + "/rest/apim/v1/system/users"
 	// Base URLs
 	const (
-		tempPassword = "Welcome123"
+		tempPassword = "FB1E2CA42284C5A9BC447775C30C82B9"
 	)
 
 	// User represents the structure of the user data to be sent in the request body
@@ -43,12 +44,13 @@ func createUser(username string) (string, error) {
 		return "", fmt.Errorf("failed to marshal user data: %v", err)
 	}
 
-	token, err := getCSRFToken()
+	// Retrieve CSRF token and cookies from the API
+	csrfToken, cookies, err := getCSRFToken()
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve CSRF token: %w", err)
 	}
 
-	req, err := http.NewRequest(http.MethodPost, baseCreateURL, bytes.NewBuffer(requestBody))
+	req, err := http.NewRequest("POST", baseCreateURL, bytes.NewBuffer(requestBody))
 	if err != nil {
 		return "", fmt.Errorf("failed to create request: %v", err)
 	}
@@ -61,9 +63,16 @@ func createUser(username string) (string, error) {
 
 	// Set the Authorization header with Bearer token
 	req.Header.Set("Authorization", "Bearer "+bearerToken)
-
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("x-csrf-token", token)
+	req.Header.Set("Accept", "*/*")
+	req.Header.Set("x-csrf-token", csrfToken)
+
+	// Set the cookies in the request header
+	var cookieStrings []string
+	for name, value := range cookies {
+		cookieStrings = append(cookieStrings, fmt.Sprintf("%s=%s", name, value))
+	}
+	req.Header.Set("Cookie", strings.Join(cookieStrings, "; "))
 
 	resp, err := httpClient.Do(req)
 	if err != nil {

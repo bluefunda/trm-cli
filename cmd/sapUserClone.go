@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/bluefunda/trm-cli/config"
 	"net/http"
+	"strings"
 )
 
 // cloneUser creates a new user with the provided username and returns a response message
@@ -26,7 +27,7 @@ func cloneUser(usernameFrom, username string) (string, error) {
 		Password     string `json:"password"`
 	}
 	// Placeholder for password, replace with actual values or logic
-	tempPassword := "Welcome123"
+	tempPassword := "FB1E2CA42284C5A9BC447775C30C82B9"
 
 	userData := userclone{
 		UserNameFrom: usernameFrom,
@@ -39,7 +40,7 @@ func cloneUser(usernameFrom, username string) (string, error) {
 		return "", fmt.Errorf("failed to marshal user data: %v", err)
 	}
 
-	token, err := getCSRFToken()
+	token, cookies, err := getCSRFToken()
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve CSRF token: %w", err)
 	}
@@ -57,9 +58,14 @@ func cloneUser(usernameFrom, username string) (string, error) {
 
 	// Set the Authorization header with Bearer token
 	req.Header.Set("Authorization", "Bearer "+bearerToken)
-
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-CSRF-Token", token)
+	// Set the cookies in the request header
+	var cookieStrings []string
+	for name, value := range cookies {
+		cookieStrings = append(cookieStrings, fmt.Sprintf("%s=%s", name, value))
+	}
+	req.Header.Set("Cookie", strings.Join(cookieStrings, "; "))
 
 	resp, err := httpClient.Do(req)
 	if err != nil {

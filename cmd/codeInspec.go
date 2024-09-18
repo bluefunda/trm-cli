@@ -7,6 +7,7 @@ import (
 	"github.com/bluefunda/trm-cli/config"
 	"io"
 	"net/http"
+	"strings"
 )
 
 // sendRequest sends a POST request for code inspection
@@ -47,7 +48,7 @@ func codeInspect(pkg string, objNames []string) (string, error) {
 	}
 
 	// Get CSRF token
-	token, err := getCSRFToken()
+	token, cookies, err := getCSRFToken()
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve CSRF token: %w", err)
 	}
@@ -60,9 +61,14 @@ func codeInspect(pkg string, objNames []string) (string, error) {
 
 	// Set the Authorization header with Bearer token
 	req.Header.Set("Authorization", "Bearer "+bearerToken)
-	// Set necessary headers
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-csrf-token", token)
+	// Set the cookies in the request header
+	var cookieStrings []string
+	for name, value := range cookies {
+		cookieStrings = append(cookieStrings, fmt.Sprintf("%s=%s", name, value))
+	}
+	req.Header.Set("Cookie", strings.Join(cookieStrings, "; "))
 
 	// Send the request
 	resp, err := httpClient.Do(req)

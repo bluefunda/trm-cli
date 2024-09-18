@@ -7,6 +7,7 @@ import (
 	"github.com/bluefunda/trm-cli/config"
 	"io"
 	"net/http"
+	"strings"
 )
 
 // sendRequest sends a POST request with the given package name
@@ -44,7 +45,7 @@ func unitTest(pkg string) (string, error) {
 		return "", fmt.Errorf("failed to create request: %v", err)
 	}
 	//get csrf token
-	token, err := getCSRFToken()
+	token, cookies, err := getCSRFToken()
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve CSRF token: %w", err)
 	}
@@ -57,9 +58,13 @@ func unitTest(pkg string) (string, error) {
 
 	// Set the Authorization header with Bearer token
 	req.Header.Set("Authorization", "Bearer "+bearerToken)
-	// Set necessary headers
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-csrf-token", token)
+	var cookieStrings []string
+	for name, value := range cookies {
+		cookieStrings = append(cookieStrings, fmt.Sprintf("%s=%s", name, value))
+	}
+	req.Header.Set("Cookie", strings.Join(cookieStrings, "; "))
 
 	// Send the request
 	resp, err := httpClient.Do(req)
