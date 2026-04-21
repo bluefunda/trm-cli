@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package bff.v1;
+
+option go_package = "github.com/bluefunda/trm-cli/api/proto/bff";
+
+// BFFService provides backend-for-frontend operations for the TRM platform.
+service BFFService {
+  // GetUserInfo retrieves user information from the IDP
+  rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse);
+
+  // SubscribeEvents establishes a server-side stream for realm-scoped events.
+  // Events are streamed until the client disconnects or context is cancelled.
+  // Realm is extracted from x-realm metadata.
+  rpc SubscribeEvents(SubscribeEventsRequest) returns (stream Event);
+
+  // PublishEvent publishes an event to a realm-scoped subject.
+  rpc PublishEvent(PublishEventRequest) returns (PublishEventResponse);
+
+  // RequestReply performs a request-reply operation with realm-scoped subject.
+  rpc RequestReply(RequestReplyRequest) returns (RequestReplyResponse);
+}
+
+message GetUserInfoRequest {}
+
+message GetUserInfoResponse {
+  string sub = 1;
+  bool email_verified = 2;
+  string name = 3;
+  string preferred_username = 4;
+  string given_name = 5;
+  string family_name = 6;
+  string email = 7;
+}
+
+message SubscribeEventsRequest {
+  // Subject pattern to subscribe to (e.g., "events.*", "notifications.>")
+  // Automatically prefixed with the realm from x-realm metadata.
+  string subject_pattern = 1;
+}
+
+message Event {
+  string subject = 1;
+  bytes data = 2;
+  string timestamp = 3;
+}
+
+message PublishEventRequest {
+  string subject = 1;
+  bytes data = 2;
+}
+
+message PublishEventResponse {}
+
+message RequestReplyRequest {
+  string subject = 1;
+  bytes data = 2;
+  // Timeout in milliseconds (default: 5000)
+  int64 timeout_ms = 3;
+}
+
+message RequestReplyResponse {
+  bytes data = 1;
+}

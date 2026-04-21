@@ -1,0 +1,136 @@
+version: 2
+
+project_name: trm
+
+builds:
+  - id: trm
+    main: ./cmd/trm
+    binary: trm
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/bluefunda/trm-cli/internal/cmd.Version={{ .Version }}
+    flags:
+      - -trimpath
+
+archives:
+  - id: trm
+    name_template: "trm_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    formats:
+      - tar.gz
+      - zip
+    format_overrides:
+      - goos: darwin
+        formats:
+          - zip
+      - goos: linux
+        formats:
+          - tar.gz
+    files:
+      - none*
+
+nfpms:
+  - id: trm
+    package_name: trm
+    ids:
+      - trm
+    vendor: Bluefunda
+    maintainer: Bluefunda <support@bluefunda.com>
+    description: Cross-platform CLI for the TRM (bluerequests) change/release management platform.
+    license: MIT
+    formats:
+      - deb
+      - rpm
+    bindir: /opt/trm/bin
+    contents:
+      - dst: /opt/trm/etc
+        type: dir
+      - dst: /opt/trm/log
+        type: dir
+      - dst: /usr/local/bin/trm
+        src: /opt/trm/bin/trm
+        type: symlink
+
+homebrew_casks:
+  - name: trm
+    ids:
+      - trm
+    binaries:
+      - trm
+    homepage: https://github.com/bluefunda/trm-cli
+    description: Cross-platform CLI for the TRM change/release management platform.
+    directory: Casks
+    url:
+      headers:
+        - 'Authorization: bearer #{ENV["HOMEBREW_GITHUB_API_TOKEN"]}'
+    repository:
+      owner: bluefunda
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^chore:"
+
+release:
+  github:
+    owner: bluefunda
+    name: trm-cli
+  draft: false
+  replace_existing_draft: true
+  name_template: "TRM CLI v{{ .Version }}"
+  header: |
+    ## TRM CLI v{{ .Version }}
+
+    Cross-platform CLI for the TRM (bluerequests) change/release management platform.
+
+    ### Installation
+
+    **Homebrew (macOS):**
+    ```bash
+    brew tap bluefunda/tap
+    brew install --cask trm
+    ```
+
+    **Debian/Ubuntu (x86_64):**
+    ```bash
+    curl -sL https://github.com/bluefunda/trm-cli/releases/download/v{{ .Version }}/trm_{{ .Version }}_linux_amd64.deb -o trm.deb
+    sudo dpkg -i trm.deb
+    ```
+
+    **Debian/Ubuntu (ARM64):**
+    ```bash
+    curl -sL https://github.com/bluefunda/trm-cli/releases/download/v{{ .Version }}/trm_{{ .Version }}_linux_arm64.deb -o trm.deb
+    sudo dpkg -i trm.deb
+    ```
+
+    **macOS (manual):**
+    ```bash
+    curl -sL https://github.com/bluefunda/trm-cli/releases/download/v{{ .Version }}/trm_{{ .Version }}_darwin_arm64.zip -o trm.zip
+    unzip trm.zip && chmod +x trm && sudo mv trm /usr/local/bin/
+    ```
+
+    **Linux (manual):**
+    ```bash
+    curl -sL https://github.com/bluefunda/trm-cli/releases/download/v{{ .Version }}/trm_{{ .Version }}_linux_amd64.tar.gz | tar xz
+    chmod +x trm && sudo mv trm /usr/local/bin/
+    ```
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
