@@ -34,7 +34,7 @@ func Ping(target string) error {
 	if err != nil {
 		return fmt.Errorf("dial: %w", err)
 	}
-	defer cc.Close()
+	defer func() { _ = cc.Close() }()
 
 	cc.Connect()
 	for {
