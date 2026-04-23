@@ -2,7 +2,7 @@
 set -e
 
 REPO="bluefunda/trm-cli"
-BINARY="trm"
+BINARY="requests"
 INSTALL_DIR=""
 
 # Colors
@@ -38,8 +38,8 @@ else
 fi
 
 # Resolve install directory
-if [ -n "$TRM_INSTALL_DIR" ]; then
-  INSTALL_DIR="$TRM_INSTALL_DIR"
+if [ -n "$REQUESTS_INSTALL_DIR" ]; then
+  INSTALL_DIR="$REQUESTS_INSTALL_DIR"
 elif [ -w "/usr/local/bin" ]; then
   INSTALL_DIR="/usr/local/bin"
 else
@@ -102,5 +102,5 @@ if [ "$INSTALL_DIR" = "$HOME/.local/bin" ]; then
   esac
 fi
 
-printf "\n${GREEN}${BOLD}TRM CLI installed!${RESET}\n"
+printf "\n${GREEN}${BOLD}requests CLI installed!${RESET}\n"
 printf "  Run: ${BOLD}${BINARY} login${RESET}\n\n"

@@ -1,11 +1,11 @@
 version: 2
 
-project_name: trm
+project_name: requests
 
 builds:
-  - id: trm
-    main: ./cmd/trm
-    binary: trm
+  - id: requests
+    main: ./cmd/requests
+    binary: requests
     env:
       - CGO_ENABLED=0
     goos:
@@ -21,8 +21,8 @@ builds:
       - -trimpath
 
 archives:
-  - id: trm
-    name_template: "trm_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+  - id: requests
+    name_template: "requests_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     formats:
       - tar.gz
       - zip
@@ -37,43 +37,40 @@ archives:
       - none*
 
 nfpms:
-  - id: trm
-    package_name: trm
+  - id: requests
+    package_name: requests
     ids:
-      - trm
+      - requests
     vendor: Bluefunda
     maintainer: Bluefunda <support@bluefunda.com>
-    description: Cross-platform CLI for the TRM (bluerequests) change/release management platform.
+    description: Cross-platform CLI for the bluerequests change/release management platform.
     license: MIT
     formats:
       - deb
       - rpm
-    bindir: /opt/trm/bin
+    bindir: /opt/requests/bin
     contents:
-      - dst: /opt/trm/etc
+      - dst: /opt/requests/etc
         type: dir
-      - dst: /opt/trm/log
+      - dst: /opt/requests/log
         type: dir
-      - dst: /usr/local/bin/trm
-        src: /opt/trm/bin/trm
+      - dst: /usr/local/bin/requests
+        src: /opt/requests/bin/requests
         type: symlink
 
 homebrew_casks:
-  - name: trm
+  - name: requests
     ids:
-      - trm
+      - requests
     binaries:
-      - trm
+      - requests
     homepage: https://github.com/bluefunda/trm-cli
-    description: Cross-platform CLI for the TRM change/release management platform.
+    description: CLI for the bluerequests change/release management platform.
     directory: Casks
-    url:
-      headers:
-        - 'Authorization: bearer #{ENV["HOMEBREW_GITHUB_API_TOKEN"]}'
     repository:
       owner: bluefunda
       name: homebrew-tap
-      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
 
 checksum:
   name_template: "checksums.txt"
@@ -94,42 +91,41 @@ release:
     name: trm-cli
   draft: false
   replace_existing_draft: true
-  name_template: "TRM CLI v{{ .Version }}"
+  name_template: "requests CLI v{{ .Version }}"
   header: |
-    ## TRM CLI v{{ .Version }}
+    ## requests CLI v{{ .Version }}
 
-    Cross-platform CLI for the TRM (bluerequests) change/release management platform.
+    Cross-platform CLI for the bluerequests change/release management platform.
 
     ### Installation
+
+    **One-line installer (macOS and Linux):**
+    ```bash
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/bluefunda/trm-cli/main/install.sh)"
+    ```
 
     **Homebrew (macOS):**
     ```bash
     brew tap bluefunda/tap
-    brew install --cask trm
+    brew install --cask requests
     ```
 
     **Debian/Ubuntu (x86_64):**
     ```bash
-    curl -sL https://github.com/bluefunda/trm-cli/releases/download/v{{ .Version }}/trm_{{ .Version }}_linux_amd64.deb -o trm.deb
-    sudo dpkg -i trm.deb
+    curl -sL https://github.com/bluefunda/trm-cli/releases/download/v{{ .Version }}/requests_{{ .Version }}_linux_amd64.deb -o requests.deb
+    sudo dpkg -i requests.deb
     ```
 
     **Debian/Ubuntu (ARM64):**
     ```bash
-    curl -sL https://github.com/bluefunda/trm-cli/releases/download/v{{ .Version }}/trm_{{ .Version }}_linux_arm64.deb -o trm.deb
-    sudo dpkg -i trm.deb
-    ```
-
-    **macOS (manual):**
-    ```bash
-    curl -sL https://github.com/bluefunda/trm-cli/releases/download/v{{ .Version }}/trm_{{ .Version }}_darwin_arm64.zip -o trm.zip
-    unzip trm.zip && chmod +x trm && sudo mv trm /usr/local/bin/
+    curl -sL https://github.com/bluefunda/trm-cli/releases/download/v{{ .Version }}/requests_{{ .Version }}_linux_arm64.deb -o requests.deb
+    sudo dpkg -i requests.deb
     ```
 
     **Linux (manual):**
     ```bash
-    curl -sL https://github.com/bluefunda/trm-cli/releases/download/v{{ .Version }}/trm_{{ .Version }}_linux_amd64.tar.gz | tar xz
-    chmod +x trm && sudo mv trm /usr/local/bin/
+    curl -sL https://github.com/bluefunda/trm-cli/releases/download/v{{ .Version }}/requests_{{ .Version }}_linux_amd64.tar.gz | tar xz
+    chmod +x requests && sudo mv requests /usr/local/bin/
     ```
 
 snapshot:

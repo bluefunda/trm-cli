@@ -16,9 +16,9 @@ var (
 var Version = "dev"
 
 var rootCmd = &cobra.Command{
-	Use:     "trm",
-	Short:   "TRM -- CLI for the bluerequests change/release management platform",
-	Long:    "TRM is a command-line interface for interacting with the TRM platform via gRPC.",
+	Use:     "requests",
+	Short:   "requests -- CLI for the bluerequests change/release management platform",
+	Long:    "requests is a command-line interface for interacting with the bluerequests platform via gRPC.",
 	Version: Version,
 }
 
