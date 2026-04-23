@@ -32,32 +32,33 @@ jobs:
     steps:
       - name: Patch Homebrew cask with API asset URLs
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
           TAG: ${{ needs.release.outputs.tag_name }}
         run: |
-          assets=$(GH_TOKEN="$GH_PAT" gh api "repos/bluefunda/trm-cli/releases/tags/${TAG}" \
+          # trm-cli is public — GITHUB_TOKEN is sufficient to read releases
+          assets=$(GH_TOKEN="$GITHUB_TOKEN" gh api "repos/bluefunda/trm-cli/releases/tags/${TAG}" \
             --jq '.assets[] | "\(.name) \(.id)"')
 
           export GH_TOKEN="$HOMEBREW_TAP_TOKEN"
 
-          gh api repos/bluefunda/homebrew-tap/contents/Casks/trm.rb \
-            --jq '.content' | base64 -d > /tmp/trm.rb
+          gh api repos/bluefunda/homebrew-tap/contents/Casks/requests.rb \
+            --jq '.content' | base64 -d > /tmp/requests.rb
 
           while read -r name id; do
             old="https://github.com/bluefunda/trm-cli/releases/download/v#{version}/${name}"
             new="https://api.github.com/repos/bluefunda/trm-cli/releases/assets/${id}"
-            sed -i "s|${old}|${new}|g" /tmp/trm.rb
+            sed -i "s|${old}|${new}|g" /tmp/requests.rb
           done <<< "$assets"
 
-          sed -i 's/Authorization: bearer/Authorization: token/g' /tmp/trm.rb
-          sed -i '/Authorization: token/a\          "Accept: application/octet-stream",' /tmp/trm.rb
+          sed -i 's/Authorization: bearer/Authorization: token/g' /tmp/requests.rb
+          sed -i '/Authorization: token/a\          "Accept: application/octet-stream",' /tmp/requests.rb
 
-          file_sha=$(gh api repos/bluefunda/homebrew-tap/contents/Casks/trm.rb --jq '.sha')
+          file_sha=$(gh api repos/bluefunda/homebrew-tap/contents/Casks/requests.rb --jq '.sha')
 
-          content=$(base64 -w 0 /tmp/trm.rb)
-          gh api repos/bluefunda/homebrew-tap/contents/Casks/trm.rb \
+          content=$(base64 -w 0 /tmp/requests.rb)
+          gh api repos/bluefunda/homebrew-tap/contents/Casks/requests.rb \
             -X PUT \
-            -f message="fix: use API asset URLs for private repo downloads (${TAG})" \
+            -f message="fix: update homebrew cask for requests CLI (${TAG})" \
             -f content="${content}" \
             -f sha="${file_sha}"
