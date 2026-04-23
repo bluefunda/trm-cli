@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/bluefunda/trm-cli/compare/v1.0.1...v1.0.2) (2026-04-23)
+
+
+### Bug Fixes
+
+* discard conn.Close() error in user info command ([29e8d37](https://github.com/bluefunda/trm-cli/commit/29e8d37441c31afe643f0d700ae0f866ae6586d3))
+
 ## [1.0.1](https://github.com/bluefunda/trm-cli/compare/v1.0.0...v1.0.1) (2026-04-23)
 
 
