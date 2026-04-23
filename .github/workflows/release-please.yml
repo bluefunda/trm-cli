@@ -3,9 +3,16 @@ name: Release
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to build (e.g. v1.1.0)'
+        required: true
+        type: string
 
 jobs:
   release:
+    if: github.event_name == 'push'
     uses: bluefunda/release-foundry/.github/workflows/release-please.yml@main
     permissions:
       contents: write
@@ -14,51 +21,14 @@ jobs:
       GH_PAT: ${{ secrets.GH_PAT }}
 
   goreleaser:
-    needs: release
-    if: ${{ needs.release.outputs.release_created }}
+    needs: [release]
+    if: ${{ always() && (github.event_name == 'workflow_dispatch' || needs.release.outputs.release_created) }}
     uses: bluefunda/release-foundry/.github/workflows/go-binary-release.yml@main
     with:
-      tag: ${{ needs.release.outputs.tag_name }}
+      tag: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || needs.release.outputs.tag_name }}
     permissions:
       contents: write
     secrets:
       GH_PAT: ${{ secrets.GH_PAT }}
       HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
 
-  homebrew-patch:
-    needs: [release, goreleaser]
-    if: ${{ needs.release.outputs.release_created }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Patch Homebrew cask with API asset URLs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
-          TAG: ${{ needs.release.outputs.tag_name }}
-        run: |
-          # trm-cli is public — GITHUB_TOKEN is sufficient to read releases
-          assets=$(GH_TOKEN="$GITHUB_TOKEN" gh api "repos/bluefunda/trm-cli/releases/tags/${TAG}" \
-            --jq '.assets[] | "\(.name) \(.id)"')
-
-          export GH_TOKEN="$HOMEBREW_TAP_TOKEN"
-
-          gh api repos/bluefunda/homebrew-tap/contents/Casks/requests.rb \
-            --jq '.content' | base64 -d > /tmp/requests.rb
-
-          while read -r name id; do
-            old="https://github.com/bluefunda/trm-cli/releases/download/v#{version}/${name}"
-            new="https://api.github.com/repos/bluefunda/trm-cli/releases/assets/${id}"
-            sed -i "s|${old}|${new}|g" /tmp/requests.rb
-          done <<< "$assets"
-
-          sed -i 's/Authorization: bearer/Authorization: token/g' /tmp/requests.rb
-          sed -i '/Authorization: token/a\          "Accept: application/octet-stream",' /tmp/requests.rb
-
-          file_sha=$(gh api repos/bluefunda/homebrew-tap/contents/Casks/requests.rb --jq '.sha')
-
-          content=$(base64 -w 0 /tmp/requests.rb)
-          gh api repos/bluefunda/homebrew-tap/contents/Casks/requests.rb \
-            -X PUT \
-            -f message="fix: update homebrew cask for requests CLI (${TAG})" \
-            -f content="${content}" \
-            -f sha="${file_sha}"
