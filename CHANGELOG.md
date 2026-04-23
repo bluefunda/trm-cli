@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/bluefunda/trm-cli/compare/v1.0.2...v1.1.0) (2026-04-23)
+
+
+### Features
+
+* rename binary from trm to requests, add cmd entry point ([e3ca5c5](https://github.com/bluefunda/trm-cli/commit/e3ca5c5a88e2e453d7d68174e49f26f5b2ab4111))
+
 ## [1.0.2](https://github.com/bluefunda/trm-cli/compare/v1.0.1...v1.0.2) (2026-04-23)
 
 
