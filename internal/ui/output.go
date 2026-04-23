@@ -142,7 +142,7 @@ func (p *Printer) Table(headers []string, rows [][]string) {
 			}
 			fmt.Fprintln(w)
 		}
-		w.Flush()
+		_ = w.Flush()
 	}
 }
 
