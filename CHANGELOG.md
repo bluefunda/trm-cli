@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/bluefunda/trm-cli/compare/v1.1.0...v1.1.1) (2026-04-23)
+
+
+### Bug Fixes
+
+* update homebrew-patch to use requests.rb and GITHUB_TOKEN for public repo ([263532b](https://github.com/bluefunda/trm-cli/commit/263532b1f9bfe280edeec96b0fd03e4640299395))
+
 ## [1.1.0](https://github.com/bluefunda/trm-cli/compare/v1.0.2...v1.1.0) (2026-04-23)
 
 
