@@ -90,7 +90,7 @@ func (p *Printer) ProtoJSON(msg proto.Message) {
 func (p *Printer) JSON(v any) {
 	enc := json.NewEncoder(p.Out)
 	enc.SetIndent("", "  ")
-	enc.Encode(v)
+	_ = enc.Encode(v)
 }
 
 // Table prints a table with the given headers and rows to stdout.

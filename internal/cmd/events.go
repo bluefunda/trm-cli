@@ -27,7 +27,7 @@ var eventsSubscribeCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		defer conn.Close()
+		defer func() { _ = conn.Close() }()
 
 		p := printer(cfg)
 
@@ -77,7 +77,7 @@ var eventsPublishCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		defer conn.Close()
+		defer func() { _ = conn.Close() }()
 
 		p := printer(cfg)
 		ctx, cancel := trmgrpc.ContextWithTimeout()
