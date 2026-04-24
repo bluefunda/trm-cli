@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/bluefunda/trm-cli/compare/v1.2.0...v1.2.1) (2026-04-24)
+
+
+### Bug Fixes
+
+* use DOCKER_USERNAME/DOCKER_PASSWORD org secrets, add continue-on-error to description step ([962beb1](https://github.com/bluefunda/trm-cli/commit/962beb1e65be6ed4d71d11383943b42dd5e193ef))
+
 ## [1.2.0](https://github.com/bluefunda/trm-cli/compare/v1.1.1...v1.2.0) (2026-04-24)
 
 
