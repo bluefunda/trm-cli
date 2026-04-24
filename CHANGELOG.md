@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/bluefunda/trm-cli/compare/v1.1.1...v1.2.0) (2026-04-24)
+
+
+### Features
+
+* add Docker image publishing to Docker Hub and ghcr.io ([de65a64](https://github.com/bluefunda/trm-cli/commit/de65a641e17f0ce9b5ad054dc60eab0e5e48fce9))
+
 ## [1.1.1](https://github.com/bluefunda/trm-cli/compare/v1.1.0...v1.1.1) (2026-04-23)
 
 
