@@ -4,105 +4,104 @@ Instructions for AI coding agents working on trm-cli.
 
 ## Project Overview
 
-Go 1.24 CLI for the TRM (bluerequests) change/release management platform. Uses Cobra for commands, gRPC for backend communication with the trm-bff service, and OAuth2 device flow (Keycloak) for authentication.
+Go 1.24 CLI for the BlueFunda bluerequests change/release management platform. All requests flow through `trm-bff` via gRPC — the CLI never talks to NATS or backend services directly.
 
-Binary name: `trm`
+Binary name: `requests`
 Module: `github.com/bluefunda/trm-cli`
+Entry point: `cmd/requests/main.go`
 Config location: `~/.trm/config.yaml`
 
 ## Build and Test Commands
 
 ```bash
-# MUST-RUN before submitting any change
-make build          # Build binary (runs go mod tidy first)
-make test           # go test -v -race -count=1 ./...
+make build          # go mod tidy + build binary to ./requests
 make vet            # go vet ./...
 make fmt            # gofmt -w .
-
-# Other targets
+make tidy           # go mod tidy
+make test           # go test -v -race -count=1 ./...
 make test-cover     # Coverage report
-make proto          # Regenerate protobuf code from api/proto/bff.proto
+make proto          # Regenerate protobuf bindings (requires protoc)
 make snapshot       # goreleaser snapshot (test release build)
 ```
 
 ### Validation Sequence
 
-Run these in order before committing:
-
 ```bash
-make fmt
-make vet
-make test
-make build
+make fmt && make vet && make test && make build
 ```
 
-All four must pass with zero errors.
+All must pass with zero errors before committing.
 
 ## Project Structure
 
 ```
-cmd/trm/main.go              # Entry point (delegates to internal/cmd.Execute)
+cmd/requests/main.go            # Entry point: invokes root command
 api/proto/
-  bff.proto                  # Source-of-truth service definition (DO NOT hand-edit generated files)
-  bff/                       # Generated Go code (bff.pb.go, bff_grpc.pb.go)
+  bff.proto                     # BFFService definition — keep in sync with trm-bff
+  bff/
+    bff.pb.go                   # Generated — do not edit by hand
+    bff_grpc.pb.go              # Generated — do not edit by hand
 internal/
-  cmd/                       # Cobra command tree
-    root.go                  # Root command, global flags, loadConfig(), outputFormat()
-    helpers.go               # bffConn(), printer(), reAuthenticate(), saveAuthTokens()
-    login.go                 # OAuth device flow login
-    health.go                # gRPC health check
-    version.go               # Version display
-    user.go                  # User commands (info)
-    events.go                # Events commands (subscribe, publish)
-    rpc.go                   # RPC commands (request)
+  cmd/
+    root.go                     # Root cobra command, global flags (--bff, --realm, --output)
+    helpers.go                  # bffConn(), printer(), token refresh utilities
+    login.go                    # OAuth2 device authorization flow
+    health.go                   # gRPC health check
+    version.go                  # Version display
+    user.go                     # User info command
+    cr.go                       # Change request + comment commands (list/get/create/update/delete/stage)
+    events.go                   # Event subscribe/publish commands
+    rpc.go                      # Low-level request-reply command
   grpc/
-    conn.go                  # gRPC connection, TLS auto-detect, auth interceptors
+    conn.go                     # gRPC connection, TLS auto-detect, auth interceptors
   auth/
-    auth.go                  # OAuth2 device authorization grant (RFC 8628)
+    auth.go                     # OAuth2 device authorization grant (RFC 8628)
   config/
-    config.go                # YAML config load/save, defaults, token validation
+    config.go                   # ~/.trm/config.yaml loader; token storage
   ui/
-    output.go                # Printer: table/json/quiet output modes
+    output.go                   # Printer: table/json/quiet output modes
 scripts/
-  generate-proto.sh          # Protobuf code generation script
+  generate-proto.sh             # Runs protoc with module= path mode
 ```
 
-## TRM BFF Service
+## BFFService RPC Surface
 
-trm-bff exposes four RPCs — the CLI covers all of them:
+| Command group          | RPC                      | Description                          |
+|------------------------|--------------------------|--------------------------------------|
+| `requests user info`   | GetUserInfo              | Current user from Keycloak           |
+| `requests events sub`  | SubscribeEvents          | Stream realm-scoped events           |
+| `requests events pub`  | PublishEvent             | Publish event to NATS subject        |
+| `requests rpc request` | RequestReply             | NATS request-reply                   |
+| `requests cr list`     | ListChangeRequests       | List change requests with filters    |
+| `requests cr get`      | GetChangeRequest         | Get a single change request by ID    |
+| `requests cr create`   | CreateChangeRequest      | Create a new change request          |
+| `requests cr update`   | UpdateChangeRequest      | Update fields on a change request    |
+| `requests cr delete`   | DeleteChangeRequest      | Archive a change request             |
+| `requests cr stage`    | UpdateChangeRequestStage | Advance the workflow stage           |
+| `requests cr comment list`   | ListComments       | List comments on a change request    |
+| `requests cr comment add`    | AddComment         | Add a comment                        |
+| `requests cr comment update` | UpdateComment      | Edit a comment                       |
+| `requests cr comment delete` | DeleteComment      | Delete a comment                     |
 
-| Command                        | RPC              | Description                              |
-|--------------------------------|------------------|------------------------------------------|
-| `trm user info`                | GetUserInfo      | Current user from Keycloak               |
-| `trm events subscribe [pat]`   | SubscribeEvents  | Stream realm-scoped events (blocking)    |
-| `trm events publish <s> <d>`   | PublishEvent     | Publish event to NATS subject            |
-| `trm rpc request <s> <d>`      | RequestReply     | NATS request-reply                       |
+## Adding a New Command
 
-Subjects are automatically prefixed with the realm by trm-bff.
+1. Create `internal/cmd/<name>.go` with a cobra command variable
+2. Register it in `root.go` via `rootCmd.AddCommand(<name>Cmd)`
+3. Use `bffConn()` from `helpers.go` to get the gRPC connection
+4. All RPC calls must go through `trm-bff` — never connect to NATS or backend directly
 
-## Safe Modification Boundaries
+## Proto Workflow
 
-### Safe to modify
-- `internal/cmd/*.go` — Add/modify CLI commands
-- `internal/ui/*.go` — Change output formatting
-- `internal/config/config.go` — Add config fields
-- `internal/auth/auth.go` — Modify auth flow
-- `internal/grpc/conn.go` — Modify connection/interceptor logic
+`api/proto/bff.proto` must stay in sync with `trm-bff/api/proto/bff.proto`. When adding RPCs:
 
-### Modify with caution
-- `api/proto/bff.proto` — Source-of-truth; run `make proto` after changes (requires protoc)
-- `Makefile` — Build system
-- `.goreleaser.yml` — Release pipeline
-
-### Do NOT modify
-- `api/proto/bff/*.pb.go` — Generated files. Run `make proto` instead.
-- `.github/workflows/*.yml` — CI/CD (uses shared workflows from `bluefunda/release-foundry`)
-- `cmd/trm/main.go` — Entry point; should remain a minimal delegation to `internal/cmd.Execute()`
+1. Add the RPC and message types to both `bff.proto` files
+2. Run `make proto` in trm-cli to regenerate client bindings
+3. Implement the client call in `internal/cmd/*.go`
+4. Implement the server handler in trm-bff `internal/transport/grpc/handler.go`
 
 ## Code Conventions
 
 ### Command pattern
-All commands follow: `trm <resource> <operation> [flags]`
 
 ```go
 var fooCmd = &cobra.Command{
@@ -119,43 +118,39 @@ var fooCmd = &cobra.Command{
 }
 ```
 
-Register sub-commands in the parent command's `init()`. Register top-level commands in `root.go` → `init()`.
+Register subcommands in the parent's `init()`. Register top-level commands in `root.go` → `init()`.
 
 ### Output contract
-- **stdout**: Data only (tables, JSON). Used for piping.
-- **stderr**: Status messages via `p.OK()`, `p.Info()`, `p.Error()`, `p.Warn()`.
-- Always support `table`, `json`, `quiet` output formats for commands that return data.
+- **stdout**: Data only (tables, JSON) — used for piping
+- **stderr**: Status messages via `p.OK()`, `p.Info()`, `p.Error()`, `p.Warn()`
+- Support `table`, `json`, `quiet` output formats for commands that return data
 
 ### Error handling
-- Use `RunE` (not `Run`) — return errors, do not `os.Exit()`.
-- Wrap errors: `fmt.Errorf("context: %w", err)`.
-
-### gRPC calls
-- Get a connection via `bffConn()` — handles auth and token refresh.
-- Always `defer conn.Close()`.
-- Use `trmgrpc.ContextWithTimeout()` for unary RPCs.
-- For streaming RPCs use `context.WithCancel` and handle SIGINT/SIGTERM.
+- Use `RunE` (not `Run`) — return errors, do not `os.Exit()`
+- Wrap errors: `fmt.Errorf("context: %w", err)`
 
 ## Git and Branch Conventions
 
 Follows `bluefunda` org-level standards:
 
-- **Conventional Commits**: `feat:`, `fix:`, `perf:`, `security:`, `infra:`, `chore:`, `docs:`, `test:`
-- **Branch naming**: `feat/<desc>` or `fix/<desc>`; `main` is protected — PR + CI required
-- **CI**: `bluefunda/release-foundry/.github/workflows/go-ci.yml@main`
-- **Release**: Release Please → GoReleaser → GitHub Release → Homebrew tap
+- **Conventional Commits**: `feat:`, `fix:`, `chore:`, `docs:`, `perf:`
+- **Branch naming**: `<type>/<short-description>`
+- **PRs**: squash-merged to `main`; title must use conventional commit format
+- **CI**: `bluefunda/release-foundry` shared workflows
+- **Release**: Release Please → GoReleaser → GitHub Release (linux/darwin amd64/arm64 + deb/rpm) + Homebrew tap
 - **Required secrets**: `GH_PAT`, `HOMEBREW_TAP_TOKEN`
 
 ## Dependencies
 
 - `github.com/spf13/cobra` — CLI framework
+- `github.com/fatih/color` — Terminal colour output
 - `google.golang.org/grpc` — gRPC client
 - `google.golang.org/protobuf` — Protobuf runtime
-- `github.com/fatih/color` — Terminal colors
 - `gopkg.in/yaml.v3` — Config file parsing
 
-Keep dependencies minimal. Run `make tidy` after any change to `go.mod`.
+## Do NOT
 
-## Known Issues / Follow-up
-
-- `trm-bff/api/proto/bff.proto` has `go_package = "github.com/bluefunda/cai-bff/..."` (copy-paste bug). Fix in trm-bff before next `make proto` run. The generated files already committed are correct.
+- Connect to NATS, trm-backend-go, or Keycloak directly from the CLI — all traffic goes through `trm-bff` via gRPC
+- Edit `api/proto/bff/bff.pb.go` or `bff_grpc.pb.go` by hand — regenerate with `make proto`
+- Commit tokens, credentials, or `~/.trm/` contents
+- Modify `.github/workflows/` without explicit request
