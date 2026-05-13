@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	DefaultBFFURL   = "trm.bluefunda.com:443"
+	DefaultBFFURL   = "requests.bluefunda.com:443"
 	DefaultDomain   = "bluefunda.com"
 	DefaultRealm    = "trm"
 	DefaultClientID = "trm-cli"
