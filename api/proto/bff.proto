@@ -6,20 +6,30 @@ option go_package = "github.com/bluefunda/trm-cli/api/proto/bff";
 
 // BFFService provides backend-for-frontend operations for the TRM platform.
 service BFFService {
-  // GetUserInfo retrieves user information from the IDP
+  // User
   rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse);
 
-  // SubscribeEvents establishes a server-side stream for realm-scoped events.
-  // Events are streamed until the client disconnects or context is cancelled.
-  // Realm is extracted from x-realm metadata.
+  // Events (message bus — CLI never hits NATS directly)
   rpc SubscribeEvents(SubscribeEventsRequest) returns (stream Event);
-
-  // PublishEvent publishes an event to a realm-scoped subject.
   rpc PublishEvent(PublishEventRequest) returns (PublishEventResponse);
-
-  // RequestReply performs a request-reply operation with realm-scoped subject.
   rpc RequestReply(RequestReplyRequest) returns (RequestReplyResponse);
+
+  // Change Requests
+  rpc ListChangeRequests(ListChangeRequestsRequest) returns (ListChangeRequestsResponse);
+  rpc GetChangeRequest(GetChangeRequestRequest) returns (GetChangeRequestResponse);
+  rpc CreateChangeRequest(CreateChangeRequestRequest) returns (CreateChangeRequestResponse);
+  rpc UpdateChangeRequest(UpdateChangeRequestRequest) returns (UpdateChangeRequestResponse);
+  rpc DeleteChangeRequest(DeleteChangeRequestRequest) returns (DeleteChangeRequestResponse);
+  rpc UpdateChangeRequestStage(UpdateChangeRequestStageRequest) returns (UpdateChangeRequestStageResponse);
+
+  // Comments
+  rpc ListComments(ListCommentsRequest) returns (ListCommentsResponse);
+  rpc AddComment(AddCommentRequest) returns (AddCommentResponse);
+  rpc UpdateComment(UpdateCommentRequest) returns (UpdateCommentResponse);
+  rpc DeleteComment(DeleteCommentRequest) returns (DeleteCommentResponse);
 }
+
+// ─── User ────────────────────────────────────────────────────────────────────
 
 message GetUserInfoRequest {}
 
@@ -33,9 +43,9 @@ message GetUserInfoResponse {
   string email = 7;
 }
 
+// ─── Events ──────────────────────────────────────────────────────────────────
+
 message SubscribeEventsRequest {
-  // Subject pattern to subscribe to (e.g., "events.*", "notifications.>")
-  // Automatically prefixed with the realm from x-realm metadata.
   string subject_pattern = 1;
 }
 
@@ -55,10 +65,130 @@ message PublishEventResponse {}
 message RequestReplyRequest {
   string subject = 1;
   bytes data = 2;
-  // Timeout in milliseconds (default: 5000)
   int64 timeout_ms = 3;
 }
 
 message RequestReplyResponse {
   bytes data = 1;
 }
+
+// ─── Change Requests ─────────────────────────────────────────────────────────
+
+message ChangeRequest {
+  string id = 1;
+  string description = 2;
+  string status = 3;
+  string request_owner = 4;
+  string request_type = 5;
+  string severity = 6;
+  string assignee = 7;
+  bool archive = 8;
+  string project_id = 9;
+  string created_at = 10;
+  string updated_at = 11;
+}
+
+message ListChangeRequestsRequest {
+  string project_id = 1;
+  string description = 2;
+  string status = 3;
+  string request_type = 4;
+  string severity = 5;
+  string assignee = 6;
+  bool include_archived = 7;
+}
+
+message ListChangeRequestsResponse {
+  repeated ChangeRequest change_requests = 1;
+}
+
+message GetChangeRequestRequest {
+  string id = 1;
+}
+
+message GetChangeRequestResponse {
+  ChangeRequest change_request = 1;
+}
+
+message CreateChangeRequestRequest {
+  string description = 1;
+  string project_id = 2;
+  string request_type = 3;
+  string severity = 4;
+  string assignee = 5;
+}
+
+message CreateChangeRequestResponse {
+  ChangeRequest change_request = 1;
+}
+
+message UpdateChangeRequestRequest {
+  string id = 1;
+  string description = 2;
+  string status = 3;
+  string request_type = 4;
+  string severity = 5;
+  string assignee = 6;
+}
+
+message UpdateChangeRequestResponse {
+  ChangeRequest change_request = 1;
+}
+
+message DeleteChangeRequestRequest {
+  string id = 1;
+}
+
+message DeleteChangeRequestResponse {}
+
+message UpdateChangeRequestStageRequest {
+  string id = 1;
+  string stage = 2;
+}
+
+message UpdateChangeRequestStageResponse {
+  ChangeRequest change_request = 1;
+}
+
+// ─── Comments ────────────────────────────────────────────────────────────────
+
+message Comment {
+  string id = 1;
+  string change_request_id = 2;
+  string message = 3;
+  string created_by = 4;
+  string created_at = 5;
+  string updated_at = 6;
+}
+
+message ListCommentsRequest {
+  string change_request_id = 1;
+}
+
+message ListCommentsResponse {
+  repeated Comment comments = 1;
+}
+
+message AddCommentRequest {
+  string change_request_id = 1;
+  string message = 2;
+}
+
+message AddCommentResponse {
+  Comment comment = 1;
+}
+
+message UpdateCommentRequest {
+  string id = 1;
+  string message = 2;
+}
+
+message UpdateCommentResponse {
+  Comment comment = 1;
+}
+
+message DeleteCommentRequest {
+  string id = 1;
+}
+
+message DeleteCommentResponse {}

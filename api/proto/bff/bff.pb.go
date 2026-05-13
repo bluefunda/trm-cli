@@ -21,7 +21,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// GetUserInfoRequest contains the access token for authentication
 type GetUserInfoRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -58,7 +57,6 @@ func (*GetUserInfoRequest) Descriptor() ([]byte, []int) {
 	return file_bff_proto_rawDescGZIP(), []int{0}
 }
 
-// GetUserInfoResponse contains user information
 type GetUserInfoResponse struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	Sub               string                 `protobuf:"bytes,1,opt,name=sub,proto3" json:"sub,omitempty"`
@@ -151,12 +149,9 @@ func (x *GetUserInfoResponse) GetEmail() string {
 	return ""
 }
 
-// SubscribeEventsRequest specifies the subject pattern to subscribe to
 type SubscribeEventsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Subject pattern to subscribe to (e.g., "events.*", "notifications.>")
-	// This is automatically prefixed with the realm from x-realm metadata
-	SubjectPattern string `protobuf:"bytes,1,opt,name=subject_pattern,json=subjectPattern,proto3" json:"subject_pattern,omitempty"`
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	SubjectPattern string                 `protobuf:"bytes,1,opt,name=subject_pattern,json=subjectPattern,proto3" json:"subject_pattern,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -198,15 +193,11 @@ func (x *SubscribeEventsRequest) GetSubjectPattern() string {
 	return ""
 }
 
-// Event represents a single event from the stream
 type Event struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The full subject the event was received on
-	Subject string `protobuf:"bytes,1,opt,name=subject,proto3" json:"subject,omitempty"`
-	// The event payload as bytes
-	Data []byte `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
-	// Timestamp when the event was received (RFC3339)
-	Timestamp     string `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Subject       string                 `protobuf:"bytes,1,opt,name=subject,proto3" json:"subject,omitempty"`
+	Data          []byte                 `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
+	Timestamp     string                 `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -262,13 +253,10 @@ func (x *Event) GetTimestamp() string {
 	return ""
 }
 
-// PublishEventRequest contains the event to publish
 type PublishEventRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Subject suffix to publish to (prefixed with realm automatically)
-	Subject string `protobuf:"bytes,1,opt,name=subject,proto3" json:"subject,omitempty"`
-	// The event payload
-	Data          []byte `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Subject       string                 `protobuf:"bytes,1,opt,name=subject,proto3" json:"subject,omitempty"`
+	Data          []byte                 `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -317,7 +305,6 @@ func (x *PublishEventRequest) GetData() []byte {
 	return nil
 }
 
-// PublishEventResponse confirms the publish operation
 type PublishEventResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -354,15 +341,11 @@ func (*PublishEventResponse) Descriptor() ([]byte, []int) {
 	return file_bff_proto_rawDescGZIP(), []int{5}
 }
 
-// RequestReplyRequest contains the request data
 type RequestReplyRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Subject suffix for the request (prefixed with realm automatically)
-	Subject string `protobuf:"bytes,1,opt,name=subject,proto3" json:"subject,omitempty"`
-	// Request payload
-	Data []byte `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
-	// Timeout in milliseconds (default: 5000)
-	TimeoutMs     int64 `protobuf:"varint,3,opt,name=timeout_ms,json=timeoutMs,proto3" json:"timeout_ms,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Subject       string                 `protobuf:"bytes,1,opt,name=subject,proto3" json:"subject,omitempty"`
+	Data          []byte                 `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
+	TimeoutMs     int64                  `protobuf:"varint,3,opt,name=timeout_ms,json=timeoutMs,proto3" json:"timeout_ms,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -418,11 +401,9 @@ func (x *RequestReplyRequest) GetTimeoutMs() int64 {
 	return 0
 }
 
-// RequestReplyResponse contains the reply data
 type RequestReplyResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Response payload
-	Data          []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Data          []byte                 `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -464,6 +445,1222 @@ func (x *RequestReplyResponse) GetData() []byte {
 	return nil
 }
 
+type ChangeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	RequestOwner  string                 `protobuf:"bytes,4,opt,name=request_owner,json=requestOwner,proto3" json:"request_owner,omitempty"`
+	RequestType   string                 `protobuf:"bytes,5,opt,name=request_type,json=requestType,proto3" json:"request_type,omitempty"`
+	Severity      string                 `protobuf:"bytes,6,opt,name=severity,proto3" json:"severity,omitempty"`
+	Assignee      string                 `protobuf:"bytes,7,opt,name=assignee,proto3" json:"assignee,omitempty"`
+	Archive       bool                   `protobuf:"varint,8,opt,name=archive,proto3" json:"archive,omitempty"`
+	ProjectId     string                 `protobuf:"bytes,9,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     string                 `protobuf:"bytes,11,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ChangeRequest) Reset() {
+	*x = ChangeRequest{}
+	mi := &file_bff_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChangeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChangeRequest) ProtoMessage() {}
+
+func (x *ChangeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChangeRequest.ProtoReflect.Descriptor instead.
+func (*ChangeRequest) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ChangeRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ChangeRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *ChangeRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *ChangeRequest) GetRequestOwner() string {
+	if x != nil {
+		return x.RequestOwner
+	}
+	return ""
+}
+
+func (x *ChangeRequest) GetRequestType() string {
+	if x != nil {
+		return x.RequestType
+	}
+	return ""
+}
+
+func (x *ChangeRequest) GetSeverity() string {
+	if x != nil {
+		return x.Severity
+	}
+	return ""
+}
+
+func (x *ChangeRequest) GetAssignee() string {
+	if x != nil {
+		return x.Assignee
+	}
+	return ""
+}
+
+func (x *ChangeRequest) GetArchive() bool {
+	if x != nil {
+		return x.Archive
+	}
+	return false
+}
+
+func (x *ChangeRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *ChangeRequest) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *ChangeRequest) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
+}
+
+type ListChangeRequestsRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	ProjectId       string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	Description     string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Status          string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	RequestType     string                 `protobuf:"bytes,4,opt,name=request_type,json=requestType,proto3" json:"request_type,omitempty"`
+	Severity        string                 `protobuf:"bytes,5,opt,name=severity,proto3" json:"severity,omitempty"`
+	Assignee        string                 `protobuf:"bytes,6,opt,name=assignee,proto3" json:"assignee,omitempty"`
+	IncludeArchived bool                   `protobuf:"varint,7,opt,name=include_archived,json=includeArchived,proto3" json:"include_archived,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *ListChangeRequestsRequest) Reset() {
+	*x = ListChangeRequestsRequest{}
+	mi := &file_bff_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListChangeRequestsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListChangeRequestsRequest) ProtoMessage() {}
+
+func (x *ListChangeRequestsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListChangeRequestsRequest.ProtoReflect.Descriptor instead.
+func (*ListChangeRequestsRequest) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ListChangeRequestsRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *ListChangeRequestsRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *ListChangeRequestsRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *ListChangeRequestsRequest) GetRequestType() string {
+	if x != nil {
+		return x.RequestType
+	}
+	return ""
+}
+
+func (x *ListChangeRequestsRequest) GetSeverity() string {
+	if x != nil {
+		return x.Severity
+	}
+	return ""
+}
+
+func (x *ListChangeRequestsRequest) GetAssignee() string {
+	if x != nil {
+		return x.Assignee
+	}
+	return ""
+}
+
+func (x *ListChangeRequestsRequest) GetIncludeArchived() bool {
+	if x != nil {
+		return x.IncludeArchived
+	}
+	return false
+}
+
+type ListChangeRequestsResponse struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	ChangeRequests []*ChangeRequest       `protobuf:"bytes,1,rep,name=change_requests,json=changeRequests,proto3" json:"change_requests,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *ListChangeRequestsResponse) Reset() {
+	*x = ListChangeRequestsResponse{}
+	mi := &file_bff_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListChangeRequestsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListChangeRequestsResponse) ProtoMessage() {}
+
+func (x *ListChangeRequestsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListChangeRequestsResponse.ProtoReflect.Descriptor instead.
+func (*ListChangeRequestsResponse) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ListChangeRequestsResponse) GetChangeRequests() []*ChangeRequest {
+	if x != nil {
+		return x.ChangeRequests
+	}
+	return nil
+}
+
+type GetChangeRequestRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetChangeRequestRequest) Reset() {
+	*x = GetChangeRequestRequest{}
+	mi := &file_bff_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetChangeRequestRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetChangeRequestRequest) ProtoMessage() {}
+
+func (x *GetChangeRequestRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetChangeRequestRequest.ProtoReflect.Descriptor instead.
+func (*GetChangeRequestRequest) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GetChangeRequestRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type GetChangeRequestResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ChangeRequest *ChangeRequest         `protobuf:"bytes,1,opt,name=change_request,json=changeRequest,proto3" json:"change_request,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetChangeRequestResponse) Reset() {
+	*x = GetChangeRequestResponse{}
+	mi := &file_bff_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetChangeRequestResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetChangeRequestResponse) ProtoMessage() {}
+
+func (x *GetChangeRequestResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetChangeRequestResponse.ProtoReflect.Descriptor instead.
+func (*GetChangeRequestResponse) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GetChangeRequestResponse) GetChangeRequest() *ChangeRequest {
+	if x != nil {
+		return x.ChangeRequest
+	}
+	return nil
+}
+
+type CreateChangeRequestRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Description   string                 `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
+	ProjectId     string                 `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	RequestType   string                 `protobuf:"bytes,3,opt,name=request_type,json=requestType,proto3" json:"request_type,omitempty"`
+	Severity      string                 `protobuf:"bytes,4,opt,name=severity,proto3" json:"severity,omitempty"`
+	Assignee      string                 `protobuf:"bytes,5,opt,name=assignee,proto3" json:"assignee,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateChangeRequestRequest) Reset() {
+	*x = CreateChangeRequestRequest{}
+	mi := &file_bff_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateChangeRequestRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateChangeRequestRequest) ProtoMessage() {}
+
+func (x *CreateChangeRequestRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateChangeRequestRequest.ProtoReflect.Descriptor instead.
+func (*CreateChangeRequestRequest) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *CreateChangeRequestRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *CreateChangeRequestRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *CreateChangeRequestRequest) GetRequestType() string {
+	if x != nil {
+		return x.RequestType
+	}
+	return ""
+}
+
+func (x *CreateChangeRequestRequest) GetSeverity() string {
+	if x != nil {
+		return x.Severity
+	}
+	return ""
+}
+
+func (x *CreateChangeRequestRequest) GetAssignee() string {
+	if x != nil {
+		return x.Assignee
+	}
+	return ""
+}
+
+type CreateChangeRequestResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ChangeRequest *ChangeRequest         `protobuf:"bytes,1,opt,name=change_request,json=changeRequest,proto3" json:"change_request,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateChangeRequestResponse) Reset() {
+	*x = CreateChangeRequestResponse{}
+	mi := &file_bff_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateChangeRequestResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateChangeRequestResponse) ProtoMessage() {}
+
+func (x *CreateChangeRequestResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateChangeRequestResponse.ProtoReflect.Descriptor instead.
+func (*CreateChangeRequestResponse) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *CreateChangeRequestResponse) GetChangeRequest() *ChangeRequest {
+	if x != nil {
+		return x.ChangeRequest
+	}
+	return nil
+}
+
+type UpdateChangeRequestRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	RequestType   string                 `protobuf:"bytes,4,opt,name=request_type,json=requestType,proto3" json:"request_type,omitempty"`
+	Severity      string                 `protobuf:"bytes,5,opt,name=severity,proto3" json:"severity,omitempty"`
+	Assignee      string                 `protobuf:"bytes,6,opt,name=assignee,proto3" json:"assignee,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateChangeRequestRequest) Reset() {
+	*x = UpdateChangeRequestRequest{}
+	mi := &file_bff_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateChangeRequestRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateChangeRequestRequest) ProtoMessage() {}
+
+func (x *UpdateChangeRequestRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateChangeRequestRequest.ProtoReflect.Descriptor instead.
+func (*UpdateChangeRequestRequest) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *UpdateChangeRequestRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateChangeRequestRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *UpdateChangeRequestRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *UpdateChangeRequestRequest) GetRequestType() string {
+	if x != nil {
+		return x.RequestType
+	}
+	return ""
+}
+
+func (x *UpdateChangeRequestRequest) GetSeverity() string {
+	if x != nil {
+		return x.Severity
+	}
+	return ""
+}
+
+func (x *UpdateChangeRequestRequest) GetAssignee() string {
+	if x != nil {
+		return x.Assignee
+	}
+	return ""
+}
+
+type UpdateChangeRequestResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ChangeRequest *ChangeRequest         `protobuf:"bytes,1,opt,name=change_request,json=changeRequest,proto3" json:"change_request,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateChangeRequestResponse) Reset() {
+	*x = UpdateChangeRequestResponse{}
+	mi := &file_bff_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateChangeRequestResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateChangeRequestResponse) ProtoMessage() {}
+
+func (x *UpdateChangeRequestResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateChangeRequestResponse.ProtoReflect.Descriptor instead.
+func (*UpdateChangeRequestResponse) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *UpdateChangeRequestResponse) GetChangeRequest() *ChangeRequest {
+	if x != nil {
+		return x.ChangeRequest
+	}
+	return nil
+}
+
+type DeleteChangeRequestRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteChangeRequestRequest) Reset() {
+	*x = DeleteChangeRequestRequest{}
+	mi := &file_bff_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteChangeRequestRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteChangeRequestRequest) ProtoMessage() {}
+
+func (x *DeleteChangeRequestRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteChangeRequestRequest.ProtoReflect.Descriptor instead.
+func (*DeleteChangeRequestRequest) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *DeleteChangeRequestRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type DeleteChangeRequestResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteChangeRequestResponse) Reset() {
+	*x = DeleteChangeRequestResponse{}
+	mi := &file_bff_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteChangeRequestResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteChangeRequestResponse) ProtoMessage() {}
+
+func (x *DeleteChangeRequestResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteChangeRequestResponse.ProtoReflect.Descriptor instead.
+func (*DeleteChangeRequestResponse) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{18}
+}
+
+type UpdateChangeRequestStageRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Stage         string                 `protobuf:"bytes,2,opt,name=stage,proto3" json:"stage,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateChangeRequestStageRequest) Reset() {
+	*x = UpdateChangeRequestStageRequest{}
+	mi := &file_bff_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateChangeRequestStageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateChangeRequestStageRequest) ProtoMessage() {}
+
+func (x *UpdateChangeRequestStageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateChangeRequestStageRequest.ProtoReflect.Descriptor instead.
+func (*UpdateChangeRequestStageRequest) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *UpdateChangeRequestStageRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateChangeRequestStageRequest) GetStage() string {
+	if x != nil {
+		return x.Stage
+	}
+	return ""
+}
+
+type UpdateChangeRequestStageResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ChangeRequest *ChangeRequest         `protobuf:"bytes,1,opt,name=change_request,json=changeRequest,proto3" json:"change_request,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateChangeRequestStageResponse) Reset() {
+	*x = UpdateChangeRequestStageResponse{}
+	mi := &file_bff_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateChangeRequestStageResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateChangeRequestStageResponse) ProtoMessage() {}
+
+func (x *UpdateChangeRequestStageResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateChangeRequestStageResponse.ProtoReflect.Descriptor instead.
+func (*UpdateChangeRequestStageResponse) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *UpdateChangeRequestStageResponse) GetChangeRequest() *ChangeRequest {
+	if x != nil {
+		return x.ChangeRequest
+	}
+	return nil
+}
+
+type Comment struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ChangeRequestId string                 `protobuf:"bytes,2,opt,name=change_request_id,json=changeRequestId,proto3" json:"change_request_id,omitempty"`
+	Message         string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	CreatedBy       string                 `protobuf:"bytes,4,opt,name=created_by,json=createdBy,proto3" json:"created_by,omitempty"`
+	CreatedAt       string                 `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt       string                 `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *Comment) Reset() {
+	*x = Comment{}
+	mi := &file_bff_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Comment) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Comment) ProtoMessage() {}
+
+func (x *Comment) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Comment.ProtoReflect.Descriptor instead.
+func (*Comment) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *Comment) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Comment) GetChangeRequestId() string {
+	if x != nil {
+		return x.ChangeRequestId
+	}
+	return ""
+}
+
+func (x *Comment) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *Comment) GetCreatedBy() string {
+	if x != nil {
+		return x.CreatedBy
+	}
+	return ""
+}
+
+func (x *Comment) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *Comment) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
+}
+
+type ListCommentsRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	ChangeRequestId string                 `protobuf:"bytes,1,opt,name=change_request_id,json=changeRequestId,proto3" json:"change_request_id,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *ListCommentsRequest) Reset() {
+	*x = ListCommentsRequest{}
+	mi := &file_bff_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListCommentsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListCommentsRequest) ProtoMessage() {}
+
+func (x *ListCommentsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListCommentsRequest.ProtoReflect.Descriptor instead.
+func (*ListCommentsRequest) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *ListCommentsRequest) GetChangeRequestId() string {
+	if x != nil {
+		return x.ChangeRequestId
+	}
+	return ""
+}
+
+type ListCommentsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Comments      []*Comment             `protobuf:"bytes,1,rep,name=comments,proto3" json:"comments,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListCommentsResponse) Reset() {
+	*x = ListCommentsResponse{}
+	mi := &file_bff_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListCommentsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListCommentsResponse) ProtoMessage() {}
+
+func (x *ListCommentsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListCommentsResponse.ProtoReflect.Descriptor instead.
+func (*ListCommentsResponse) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *ListCommentsResponse) GetComments() []*Comment {
+	if x != nil {
+		return x.Comments
+	}
+	return nil
+}
+
+type AddCommentRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	ChangeRequestId string                 `protobuf:"bytes,1,opt,name=change_request_id,json=changeRequestId,proto3" json:"change_request_id,omitempty"`
+	Message         string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *AddCommentRequest) Reset() {
+	*x = AddCommentRequest{}
+	mi := &file_bff_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddCommentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddCommentRequest) ProtoMessage() {}
+
+func (x *AddCommentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddCommentRequest.ProtoReflect.Descriptor instead.
+func (*AddCommentRequest) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *AddCommentRequest) GetChangeRequestId() string {
+	if x != nil {
+		return x.ChangeRequestId
+	}
+	return ""
+}
+
+func (x *AddCommentRequest) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type AddCommentResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Comment       *Comment               `protobuf:"bytes,1,opt,name=comment,proto3" json:"comment,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AddCommentResponse) Reset() {
+	*x = AddCommentResponse{}
+	mi := &file_bff_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddCommentResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddCommentResponse) ProtoMessage() {}
+
+func (x *AddCommentResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddCommentResponse.ProtoReflect.Descriptor instead.
+func (*AddCommentResponse) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *AddCommentResponse) GetComment() *Comment {
+	if x != nil {
+		return x.Comment
+	}
+	return nil
+}
+
+type UpdateCommentRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateCommentRequest) Reset() {
+	*x = UpdateCommentRequest{}
+	mi := &file_bff_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateCommentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateCommentRequest) ProtoMessage() {}
+
+func (x *UpdateCommentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateCommentRequest.ProtoReflect.Descriptor instead.
+func (*UpdateCommentRequest) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *UpdateCommentRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateCommentRequest) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type UpdateCommentResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Comment       *Comment               `protobuf:"bytes,1,opt,name=comment,proto3" json:"comment,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateCommentResponse) Reset() {
+	*x = UpdateCommentResponse{}
+	mi := &file_bff_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateCommentResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateCommentResponse) ProtoMessage() {}
+
+func (x *UpdateCommentResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateCommentResponse.ProtoReflect.Descriptor instead.
+func (*UpdateCommentResponse) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *UpdateCommentResponse) GetComment() *Comment {
+	if x != nil {
+		return x.Comment
+	}
+	return nil
+}
+
+type DeleteCommentRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteCommentRequest) Reset() {
+	*x = DeleteCommentRequest{}
+	mi := &file_bff_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteCommentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteCommentRequest) ProtoMessage() {}
+
+func (x *DeleteCommentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteCommentRequest.ProtoReflect.Descriptor instead.
+func (*DeleteCommentRequest) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *DeleteCommentRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type DeleteCommentResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteCommentResponse) Reset() {
+	*x = DeleteCommentResponse{}
+	mi := &file_bff_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteCommentResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteCommentResponse) ProtoMessage() {}
+
+func (x *DeleteCommentResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_bff_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteCommentResponse.ProtoReflect.Descriptor instead.
+func (*DeleteCommentResponse) Descriptor() ([]byte, []int) {
+	return file_bff_proto_rawDescGZIP(), []int{29}
+}
+
 var File_bff_proto protoreflect.FileDescriptor
 
 const file_bff_proto_rawDesc = "" +
@@ -496,13 +1693,108 @@ const file_bff_proto_rawDesc = "" +
 	"\n" +
 	"timeout_ms\x18\x03 \x01(\x03R\ttimeoutMs\"*\n" +
 	"\x14RequestReplyResponse\x12\x12\n" +
-	"\x04data\x18\x01 \x01(\fR\x04data2\xae\x02\n" +
+	"\x04data\x18\x01 \x01(\fR\x04data\"\xd0\x02\n" +
+	"\rChangeRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x16\n" +
+	"\x06status\x18\x03 \x01(\tR\x06status\x12#\n" +
+	"\rrequest_owner\x18\x04 \x01(\tR\frequestOwner\x12!\n" +
+	"\frequest_type\x18\x05 \x01(\tR\vrequestType\x12\x1a\n" +
+	"\bseverity\x18\x06 \x01(\tR\bseverity\x12\x1a\n" +
+	"\bassignee\x18\a \x01(\tR\bassignee\x12\x18\n" +
+	"\aarchive\x18\b \x01(\bR\aarchive\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\t \x01(\tR\tprojectId\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\n" +
+	" \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\v \x01(\tR\tupdatedAt\"\xfa\x01\n" +
+	"\x19ListChangeRequestsRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x16\n" +
+	"\x06status\x18\x03 \x01(\tR\x06status\x12!\n" +
+	"\frequest_type\x18\x04 \x01(\tR\vrequestType\x12\x1a\n" +
+	"\bseverity\x18\x05 \x01(\tR\bseverity\x12\x1a\n" +
+	"\bassignee\x18\x06 \x01(\tR\bassignee\x12)\n" +
+	"\x10include_archived\x18\a \x01(\bR\x0fincludeArchived\"\\\n" +
+	"\x1aListChangeRequestsResponse\x12>\n" +
+	"\x0fchange_requests\x18\x01 \x03(\v2\x15.bff.v1.ChangeRequestR\x0echangeRequests\")\n" +
+	"\x17GetChangeRequestRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"X\n" +
+	"\x18GetChangeRequestResponse\x12<\n" +
+	"\x0echange_request\x18\x01 \x01(\v2\x15.bff.v1.ChangeRequestR\rchangeRequest\"\xb8\x01\n" +
+	"\x1aCreateChangeRequestRequest\x12 \n" +
+	"\vdescription\x18\x01 \x01(\tR\vdescription\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x02 \x01(\tR\tprojectId\x12!\n" +
+	"\frequest_type\x18\x03 \x01(\tR\vrequestType\x12\x1a\n" +
+	"\bseverity\x18\x04 \x01(\tR\bseverity\x12\x1a\n" +
+	"\bassignee\x18\x05 \x01(\tR\bassignee\"[\n" +
+	"\x1bCreateChangeRequestResponse\x12<\n" +
+	"\x0echange_request\x18\x01 \x01(\v2\x15.bff.v1.ChangeRequestR\rchangeRequest\"\xc1\x01\n" +
+	"\x1aUpdateChangeRequestRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x16\n" +
+	"\x06status\x18\x03 \x01(\tR\x06status\x12!\n" +
+	"\frequest_type\x18\x04 \x01(\tR\vrequestType\x12\x1a\n" +
+	"\bseverity\x18\x05 \x01(\tR\bseverity\x12\x1a\n" +
+	"\bassignee\x18\x06 \x01(\tR\bassignee\"[\n" +
+	"\x1bUpdateChangeRequestResponse\x12<\n" +
+	"\x0echange_request\x18\x01 \x01(\v2\x15.bff.v1.ChangeRequestR\rchangeRequest\",\n" +
+	"\x1aDeleteChangeRequestRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x1d\n" +
+	"\x1bDeleteChangeRequestResponse\"G\n" +
+	"\x1fUpdateChangeRequestStageRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05stage\x18\x02 \x01(\tR\x05stage\"`\n" +
+	" UpdateChangeRequestStageResponse\x12<\n" +
+	"\x0echange_request\x18\x01 \x01(\v2\x15.bff.v1.ChangeRequestR\rchangeRequest\"\xbc\x01\n" +
+	"\aComment\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12*\n" +
+	"\x11change_request_id\x18\x02 \x01(\tR\x0fchangeRequestId\x12\x18\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\x12\x1d\n" +
+	"\n" +
+	"created_by\x18\x04 \x01(\tR\tcreatedBy\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x05 \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\x06 \x01(\tR\tupdatedAt\"A\n" +
+	"\x13ListCommentsRequest\x12*\n" +
+	"\x11change_request_id\x18\x01 \x01(\tR\x0fchangeRequestId\"C\n" +
+	"\x14ListCommentsResponse\x12+\n" +
+	"\bcomments\x18\x01 \x03(\v2\x0f.bff.v1.CommentR\bcomments\"Y\n" +
+	"\x11AddCommentRequest\x12*\n" +
+	"\x11change_request_id\x18\x01 \x01(\tR\x0fchangeRequestId\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"?\n" +
+	"\x12AddCommentResponse\x12)\n" +
+	"\acomment\x18\x01 \x01(\v2\x0f.bff.v1.CommentR\acomment\"@\n" +
+	"\x14UpdateCommentRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"B\n" +
+	"\x15UpdateCommentResponse\x12)\n" +
+	"\acomment\x18\x01 \x01(\v2\x0f.bff.v1.CommentR\acomment\"&\n" +
+	"\x14DeleteCommentRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x17\n" +
+	"\x15DeleteCommentResponse2\x9d\t\n" +
 	"\n" +
 	"BFFService\x12F\n" +
 	"\vGetUserInfo\x12\x1a.bff.v1.GetUserInfoRequest\x1a\x1b.bff.v1.GetUserInfoResponse\x12B\n" +
 	"\x0fSubscribeEvents\x12\x1e.bff.v1.SubscribeEventsRequest\x1a\r.bff.v1.Event0\x01\x12I\n" +
 	"\fPublishEvent\x12\x1b.bff.v1.PublishEventRequest\x1a\x1c.bff.v1.PublishEventResponse\x12I\n" +
-	"\fRequestReply\x12\x1b.bff.v1.RequestReplyRequest\x1a\x1c.bff.v1.RequestReplyResponseB,Z*github.com/bluefunda/cai-bff/api/proto/bffb\x06proto3"
+	"\fRequestReply\x12\x1b.bff.v1.RequestReplyRequest\x1a\x1c.bff.v1.RequestReplyResponse\x12[\n" +
+	"\x12ListChangeRequests\x12!.bff.v1.ListChangeRequestsRequest\x1a\".bff.v1.ListChangeRequestsResponse\x12U\n" +
+	"\x10GetChangeRequest\x12\x1f.bff.v1.GetChangeRequestRequest\x1a .bff.v1.GetChangeRequestResponse\x12^\n" +
+	"\x13CreateChangeRequest\x12\".bff.v1.CreateChangeRequestRequest\x1a#.bff.v1.CreateChangeRequestResponse\x12^\n" +
+	"\x13UpdateChangeRequest\x12\".bff.v1.UpdateChangeRequestRequest\x1a#.bff.v1.UpdateChangeRequestResponse\x12^\n" +
+	"\x13DeleteChangeRequest\x12\".bff.v1.DeleteChangeRequestRequest\x1a#.bff.v1.DeleteChangeRequestResponse\x12m\n" +
+	"\x18UpdateChangeRequestStage\x12'.bff.v1.UpdateChangeRequestStageRequest\x1a(.bff.v1.UpdateChangeRequestStageResponse\x12I\n" +
+	"\fListComments\x12\x1b.bff.v1.ListCommentsRequest\x1a\x1c.bff.v1.ListCommentsResponse\x12C\n" +
+	"\n" +
+	"AddComment\x12\x19.bff.v1.AddCommentRequest\x1a\x1a.bff.v1.AddCommentResponse\x12L\n" +
+	"\rUpdateComment\x12\x1c.bff.v1.UpdateCommentRequest\x1a\x1d.bff.v1.UpdateCommentResponse\x12L\n" +
+	"\rDeleteComment\x12\x1c.bff.v1.DeleteCommentRequest\x1a\x1d.bff.v1.DeleteCommentResponseB,Z*github.com/bluefunda/trm-cli/api/proto/bffb\x06proto3"
 
 var (
 	file_bff_proto_rawDescOnce sync.Once
@@ -516,31 +1808,81 @@ func file_bff_proto_rawDescGZIP() []byte {
 	return file_bff_proto_rawDescData
 }
 
-var file_bff_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_bff_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
 var file_bff_proto_goTypes = []any{
-	(*GetUserInfoRequest)(nil),     // 0: bff.v1.GetUserInfoRequest
-	(*GetUserInfoResponse)(nil),    // 1: bff.v1.GetUserInfoResponse
-	(*SubscribeEventsRequest)(nil), // 2: bff.v1.SubscribeEventsRequest
-	(*Event)(nil),                  // 3: bff.v1.Event
-	(*PublishEventRequest)(nil),    // 4: bff.v1.PublishEventRequest
-	(*PublishEventResponse)(nil),   // 5: bff.v1.PublishEventResponse
-	(*RequestReplyRequest)(nil),    // 6: bff.v1.RequestReplyRequest
-	(*RequestReplyResponse)(nil),   // 7: bff.v1.RequestReplyResponse
+	(*GetUserInfoRequest)(nil),               // 0: bff.v1.GetUserInfoRequest
+	(*GetUserInfoResponse)(nil),              // 1: bff.v1.GetUserInfoResponse
+	(*SubscribeEventsRequest)(nil),           // 2: bff.v1.SubscribeEventsRequest
+	(*Event)(nil),                            // 3: bff.v1.Event
+	(*PublishEventRequest)(nil),              // 4: bff.v1.PublishEventRequest
+	(*PublishEventResponse)(nil),             // 5: bff.v1.PublishEventResponse
+	(*RequestReplyRequest)(nil),              // 6: bff.v1.RequestReplyRequest
+	(*RequestReplyResponse)(nil),             // 7: bff.v1.RequestReplyResponse
+	(*ChangeRequest)(nil),                    // 8: bff.v1.ChangeRequest
+	(*ListChangeRequestsRequest)(nil),        // 9: bff.v1.ListChangeRequestsRequest
+	(*ListChangeRequestsResponse)(nil),       // 10: bff.v1.ListChangeRequestsResponse
+	(*GetChangeRequestRequest)(nil),          // 11: bff.v1.GetChangeRequestRequest
+	(*GetChangeRequestResponse)(nil),         // 12: bff.v1.GetChangeRequestResponse
+	(*CreateChangeRequestRequest)(nil),       // 13: bff.v1.CreateChangeRequestRequest
+	(*CreateChangeRequestResponse)(nil),      // 14: bff.v1.CreateChangeRequestResponse
+	(*UpdateChangeRequestRequest)(nil),       // 15: bff.v1.UpdateChangeRequestRequest
+	(*UpdateChangeRequestResponse)(nil),      // 16: bff.v1.UpdateChangeRequestResponse
+	(*DeleteChangeRequestRequest)(nil),       // 17: bff.v1.DeleteChangeRequestRequest
+	(*DeleteChangeRequestResponse)(nil),      // 18: bff.v1.DeleteChangeRequestResponse
+	(*UpdateChangeRequestStageRequest)(nil),  // 19: bff.v1.UpdateChangeRequestStageRequest
+	(*UpdateChangeRequestStageResponse)(nil), // 20: bff.v1.UpdateChangeRequestStageResponse
+	(*Comment)(nil),                          // 21: bff.v1.Comment
+	(*ListCommentsRequest)(nil),              // 22: bff.v1.ListCommentsRequest
+	(*ListCommentsResponse)(nil),             // 23: bff.v1.ListCommentsResponse
+	(*AddCommentRequest)(nil),                // 24: bff.v1.AddCommentRequest
+	(*AddCommentResponse)(nil),               // 25: bff.v1.AddCommentResponse
+	(*UpdateCommentRequest)(nil),             // 26: bff.v1.UpdateCommentRequest
+	(*UpdateCommentResponse)(nil),            // 27: bff.v1.UpdateCommentResponse
+	(*DeleteCommentRequest)(nil),             // 28: bff.v1.DeleteCommentRequest
+	(*DeleteCommentResponse)(nil),            // 29: bff.v1.DeleteCommentResponse
 }
 var file_bff_proto_depIdxs = []int32{
-	0, // 0: bff.v1.BFFService.GetUserInfo:input_type -> bff.v1.GetUserInfoRequest
-	2, // 1: bff.v1.BFFService.SubscribeEvents:input_type -> bff.v1.SubscribeEventsRequest
-	4, // 2: bff.v1.BFFService.PublishEvent:input_type -> bff.v1.PublishEventRequest
-	6, // 3: bff.v1.BFFService.RequestReply:input_type -> bff.v1.RequestReplyRequest
-	1, // 4: bff.v1.BFFService.GetUserInfo:output_type -> bff.v1.GetUserInfoResponse
-	3, // 5: bff.v1.BFFService.SubscribeEvents:output_type -> bff.v1.Event
-	5, // 6: bff.v1.BFFService.PublishEvent:output_type -> bff.v1.PublishEventResponse
-	7, // 7: bff.v1.BFFService.RequestReply:output_type -> bff.v1.RequestReplyResponse
-	4, // [4:8] is the sub-list for method output_type
-	0, // [0:4] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	8,  // 0: bff.v1.ListChangeRequestsResponse.change_requests:type_name -> bff.v1.ChangeRequest
+	8,  // 1: bff.v1.GetChangeRequestResponse.change_request:type_name -> bff.v1.ChangeRequest
+	8,  // 2: bff.v1.CreateChangeRequestResponse.change_request:type_name -> bff.v1.ChangeRequest
+	8,  // 3: bff.v1.UpdateChangeRequestResponse.change_request:type_name -> bff.v1.ChangeRequest
+	8,  // 4: bff.v1.UpdateChangeRequestStageResponse.change_request:type_name -> bff.v1.ChangeRequest
+	21, // 5: bff.v1.ListCommentsResponse.comments:type_name -> bff.v1.Comment
+	21, // 6: bff.v1.AddCommentResponse.comment:type_name -> bff.v1.Comment
+	21, // 7: bff.v1.UpdateCommentResponse.comment:type_name -> bff.v1.Comment
+	0,  // 8: bff.v1.BFFService.GetUserInfo:input_type -> bff.v1.GetUserInfoRequest
+	2,  // 9: bff.v1.BFFService.SubscribeEvents:input_type -> bff.v1.SubscribeEventsRequest
+	4,  // 10: bff.v1.BFFService.PublishEvent:input_type -> bff.v1.PublishEventRequest
+	6,  // 11: bff.v1.BFFService.RequestReply:input_type -> bff.v1.RequestReplyRequest
+	9,  // 12: bff.v1.BFFService.ListChangeRequests:input_type -> bff.v1.ListChangeRequestsRequest
+	11, // 13: bff.v1.BFFService.GetChangeRequest:input_type -> bff.v1.GetChangeRequestRequest
+	13, // 14: bff.v1.BFFService.CreateChangeRequest:input_type -> bff.v1.CreateChangeRequestRequest
+	15, // 15: bff.v1.BFFService.UpdateChangeRequest:input_type -> bff.v1.UpdateChangeRequestRequest
+	17, // 16: bff.v1.BFFService.DeleteChangeRequest:input_type -> bff.v1.DeleteChangeRequestRequest
+	19, // 17: bff.v1.BFFService.UpdateChangeRequestStage:input_type -> bff.v1.UpdateChangeRequestStageRequest
+	22, // 18: bff.v1.BFFService.ListComments:input_type -> bff.v1.ListCommentsRequest
+	24, // 19: bff.v1.BFFService.AddComment:input_type -> bff.v1.AddCommentRequest
+	26, // 20: bff.v1.BFFService.UpdateComment:input_type -> bff.v1.UpdateCommentRequest
+	28, // 21: bff.v1.BFFService.DeleteComment:input_type -> bff.v1.DeleteCommentRequest
+	1,  // 22: bff.v1.BFFService.GetUserInfo:output_type -> bff.v1.GetUserInfoResponse
+	3,  // 23: bff.v1.BFFService.SubscribeEvents:output_type -> bff.v1.Event
+	5,  // 24: bff.v1.BFFService.PublishEvent:output_type -> bff.v1.PublishEventResponse
+	7,  // 25: bff.v1.BFFService.RequestReply:output_type -> bff.v1.RequestReplyResponse
+	10, // 26: bff.v1.BFFService.ListChangeRequests:output_type -> bff.v1.ListChangeRequestsResponse
+	12, // 27: bff.v1.BFFService.GetChangeRequest:output_type -> bff.v1.GetChangeRequestResponse
+	14, // 28: bff.v1.BFFService.CreateChangeRequest:output_type -> bff.v1.CreateChangeRequestResponse
+	16, // 29: bff.v1.BFFService.UpdateChangeRequest:output_type -> bff.v1.UpdateChangeRequestResponse
+	18, // 30: bff.v1.BFFService.DeleteChangeRequest:output_type -> bff.v1.DeleteChangeRequestResponse
+	20, // 31: bff.v1.BFFService.UpdateChangeRequestStage:output_type -> bff.v1.UpdateChangeRequestStageResponse
+	23, // 32: bff.v1.BFFService.ListComments:output_type -> bff.v1.ListCommentsResponse
+	25, // 33: bff.v1.BFFService.AddComment:output_type -> bff.v1.AddCommentResponse
+	27, // 34: bff.v1.BFFService.UpdateComment:output_type -> bff.v1.UpdateCommentResponse
+	29, // 35: bff.v1.BFFService.DeleteComment:output_type -> bff.v1.DeleteCommentResponse
+	22, // [22:36] is the sub-list for method output_type
+	8,  // [8:22] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_bff_proto_init() }
@@ -554,7 +1896,7 @@ func file_bff_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bff_proto_rawDesc), len(file_bff_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   30,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

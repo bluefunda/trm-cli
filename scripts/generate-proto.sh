@@ -12,15 +12,16 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 PROTO_DIR="$ROOT_DIR/api/proto"
 OUT_DIR="$PROTO_DIR/bff"
+MODULE="github.com/bluefunda/trm-cli"
 
 mkdir -p "$OUT_DIR"
 
 protoc \
   --proto_path="$PROTO_DIR" \
   --go_out="$ROOT_DIR" \
-  --go_opt=paths=source_relative \
+  --go_opt=module="$MODULE" \
   --go-grpc_out="$ROOT_DIR" \
-  --go-grpc_opt=paths=source_relative \
+  --go-grpc_opt=module="$MODULE" \
   "$PROTO_DIR/bff.proto"
 
 echo "Proto generation complete: $OUT_DIR"
