@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/bluefunda/trm-cli/compare/v1.3.0...v1.4.0) (2026-05-13)
+
+
+### Features
+
+* **cli:** add shell completion support for all major shells ([#16](https://github.com/bluefunda/trm-cli/issues/16)) ([d6e9b27](https://github.com/bluefunda/trm-cli/commit/d6e9b27ea2c29157e43fb9e12f2740ce30b862f9))
+
 ## [1.3.0](https://github.com/bluefunda/trm-cli/compare/v1.2.1...v1.3.0) (2026-05-13)
 
 
