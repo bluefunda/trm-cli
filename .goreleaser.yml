@@ -122,6 +122,16 @@ release:
     sudo dpkg -i requests.deb
     ```
 
+    **RHEL / Fedora / Rocky (x86_64):**
+    ```bash
+    sudo dnf install https://github.com/bluefunda/trm-cli/releases/download/v{{ .Version }}/requests_{{ .Version }}_linux_amd64.rpm
+    ```
+
+    **RHEL / Fedora / Rocky (ARM64):**
+    ```bash
+    sudo dnf install https://github.com/bluefunda/trm-cli/releases/download/v{{ .Version }}/requests_{{ .Version }}_linux_arm64.rpm
+    ```
+
     **Linux (manual):**
     ```bash
     curl -sL https://github.com/bluefunda/trm-cli/releases/download/v{{ .Version }}/requests_{{ .Version }}_linux_amd64.tar.gz | tar xz

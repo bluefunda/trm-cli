@@ -24,14 +24,18 @@ brew install --cask requests
 ### Debian / Ubuntu
 
 ```bash
-curl -sL https://github.com/bluefunda/trm-cli/releases/latest/download/requests_<version>_linux_amd64.deb -o requests.deb
+VER=$(curl -fsSL https://api.github.com/repos/bluefunda/trm-cli/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
+curl -sL "https://github.com/bluefunda/trm-cli/releases/download/v${VER}/requests_${VER}_linux_${ARCH}.deb" -o requests.deb
 sudo dpkg -i requests.deb
 ```
 
 ### RHEL / Fedora / Rocky
 
 ```bash
-sudo dnf install https://github.com/bluefunda/trm-cli/releases/latest/download/requests_<version>_linux_amd64.rpm
+VER=$(curl -fsSL https://api.github.com/repos/bluefunda/trm-cli/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
+sudo dnf install "https://github.com/bluefunda/trm-cli/releases/download/v${VER}/requests_${VER}_linux_${ARCH}.rpm"
 ```
 
 ### From GitHub Releases
