@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/bluefunda/trm-cli/compare/v1.2.1...v1.3.0) (2026-05-13)
+
+
+### Features
+
+* add change request and comment CLI commands ([#13](https://github.com/bluefunda/trm-cli/issues/13)) ([afaa78a](https://github.com/bluefunda/trm-cli/commit/afaa78a83df4d60ef8140183c0c8f9b59911dbb9))
+
 ## [1.2.1](https://github.com/bluefunda/trm-cli/compare/v1.2.0...v1.2.1) (2026-04-24)
 
 
