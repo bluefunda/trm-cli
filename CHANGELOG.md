@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.2](https://github.com/bluefunda/trm-cli/compare/v1.4.1...v1.4.2) (2026-05-13)
+
+
+### Bug Fixes
+
+* remove Docker Hub release, publish to ghcr only ([cdb3ce3](https://github.com/bluefunda/trm-cli/commit/cdb3ce3ecaef0e5f3e6cfebe5f005aff54954803))
+
 ## [1.4.1](https://github.com/bluefunda/trm-cli/compare/v1.4.0...v1.4.1) (2026-05-13)
 
 
