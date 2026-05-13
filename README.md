@@ -2,7 +2,7 @@
 
 Command line interface for the [BlueFunda](https://bluefunda.com) bluerequests platform — event-driven change and release management for SAP operations.
 
-The binary is `requests`. Use it to subscribe to events, publish messages, manage users, and interact with the BFF gRPC API from the terminal.
+The binary is `requests`. Use it to manage change requests, subscribe to events, manage users, and interact with the TRM platform via gRPC — all requests flow through `trm-bff`, never directly to the backend.
 
 ## Installation
 
@@ -60,14 +60,29 @@ requests login
 # Check connection
 requests health
 
-# Subscribe to all events
-requests events subscribe
+# List change requests
+requests cr list
 
-# Subscribe to a specific pattern
-requests events subscribe "orders.>"
+# List for a specific project, with filters
+requests cr list --project <project-id> --status open --severity high
 
-# Publish an event
-requests events publish "orders.created" '{"id":"123"}'
+# Get a single change request
+requests cr get <id>
+
+# Create a change request
+requests cr create --description "Enable new payment gateway" --project <id> --type "feature" --severity "medium"
+
+# Update a change request
+requests cr update <id> --status "in-progress" --assignee john.doe
+
+# Advance stage
+requests cr stage <id> --stage "qa"
+
+# List comments
+requests cr comment list <cr-id>
+
+# Add a comment
+requests cr comment add <cr-id> --message "Approved for QA deployment"
 
 # Show current user
 requests user info
@@ -75,15 +90,65 @@ requests user info
 
 ## Commands
 
+### Auth & Connectivity
+
 | Command | Description |
 |---------|-------------|
 | `requests login` | Authenticate via OAuth2 device flow |
 | `requests health` | Check gRPC connection to the backend |
+| `requests user info` | Show current user details |
+| `requests version` | Print CLI version |
+
+### Change Requests
+
+| Command | Description |
+|---------|-------------|
+| `requests cr list [flags]` | List change requests (with optional filters) |
+| `requests cr get <id>` | Get a change request by ID |
+| `requests cr create [flags]` | Create a new change request |
+| `requests cr update <id> [flags]` | Update fields on a change request |
+| `requests cr delete <id>` | Archive a change request |
+| `requests cr stage <id> --stage <stage>` | Update the workflow stage |
+
+#### `cr list` flags
+
+| Flag | Description |
+|------|-------------|
+| `--project` | Filter by project ID |
+| `--description` | Filter by description (partial match) |
+| `--status` | Filter by status |
+| `--type` | Filter by request type |
+| `--severity` | Filter by severity |
+| `--assignee` | Filter by assignee |
+| `--archived` | Include archived change requests |
+
+#### `cr create` / `cr update` flags
+
+| Flag | Description |
+|------|-------------|
+| `--description` | Change request description |
+| `--project` | Project ID |
+| `--type` | Request type |
+| `--severity` | Severity level |
+| `--assignee` | Assignee username |
+| `--status` | *(update only)* New status |
+
+### Comments
+
+| Command | Description |
+|---------|-------------|
+| `requests cr comment list <cr-id>` | List comments on a change request |
+| `requests cr comment add <cr-id> --message "..."` | Add a comment |
+| `requests cr comment update <comment-id> --message "..."` | Edit a comment |
+| `requests cr comment delete <comment-id>` | Delete a comment |
+
+### Events (low-level)
+
+| Command | Description |
+|---------|-------------|
 | `requests events subscribe [pattern]` | Stream realm-scoped events (Ctrl-C to stop) |
 | `requests events publish <subject> <data>` | Publish an event to a realm-scoped subject |
 | `requests rpc request <subject> <data>` | Low-level request-reply |
-| `requests user info` | Show current user details |
-| `requests version` | Print CLI version |
 
 Run `requests <command> --help` for full options.
 
