@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/bluefunda/trm-cli/compare/v1.4.2...v1.5.0) (2026-05-14)
+
+
+### Features
+
+* add macOS notarization to brew cask installer ([243f4a4](https://github.com/bluefunda/trm-cli/commit/243f4a4b172ca2e11cf572fd249bbfd9afd63a46))
+
 ## [1.4.2](https://github.com/bluefunda/trm-cli/compare/v1.4.1...v1.4.2) (2026-05-13)
 
 
